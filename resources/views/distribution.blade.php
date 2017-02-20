@@ -56,16 +56,32 @@
 
 <div class="row form-horizontal">
         <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-sm-3">
-            @foreach($programmer as $mess)
-                <div id="{!! $mess->id !!}"   draggable="true" ondragstart="drag(event)"  width="88" height="31">
-                    <img style="display: block; position: relative; border: 1px solid #c1c1c1;    border-radius: 10px; float: right; width: 65px; height: 65px;"  src="https://pp.vk.me/c631616/v631616713/1fbdb/a5idV46L-38.jpg">
-                    Lvl: <span>{!! $mess->level !!}</span></br>
-                    Name:  <span>{!! $mess->name !!}</span></br>
-                    Directions:  <span>{!! $mess->Directions !!}</span></br>
-                    <input type="hidden" name="prog_id{!! $mess->id !!}" value="{!! $mess->id !!} ">
-                    <hr>
-                </div>
-            @endforeach
+            @if(isset($developer))
+                @foreach($developer as $mess)
+                    <script>
+                        var task_Check =document.getElementById("{!! $mess->FirstName !!}{!! $mess->LastName !!}");
+                        console.log(task_Check);
+                        if(task_Check != null) {
+                            document.write("<div style='display:none'></div>");
+                            var span = document.createElement('span');
+                            span.innerHTML = ", {!! $mess->getTagSpeciality[0]->tag!!}";
+                            document.getElementById("{!! $mess->FirstName !!}{!! $mess->LastName !!}").getElementsByTagName("span")[document.getElementById("{!! $mess->FirstName !!}{!! $mess->LastName !!}").getElementsByTagName("span").length - 1].appendChild(span);
+                        }else
+                            document.write("<div id='{!! $mess->FirstName !!}{!! $mess->LastName !!}'draggable='true' ondragstart='drag(event)'  width='88' height='31'><img style='display: block; position: relative; border: 1px solid #c1c1c1;    border-radius: 10px; float: right; width: 65px; height: 65px;'  src='https://pp.vk.me/c631616/v631616713/1fbdb/a5idV46L-38.jpg'>Lvl: <span>{!! $mess->getLvl['lvl'] !!}</span></br>Name:  <span>{!! $mess->FirstName !!}</span></br>LastName:  <span>{!! $mess->LastName !!}</span></br>Directions:  <span>{!! $mess->getSpeciality['speciality']!!}</span></br>Time:  <span>{!! $mess->AvailablePerWeek!!}</span></br>Tags:  <span>{!! $mess->getTagSpeciality[0]->tag!!}</span></br> <input type='hidden' name='prog_id{!! $mess->id !!}' value='{!! $mess->id !!}'> <hr> </div>");
+                    </script>
+                    {{--<div id="{!! $mess->FirstName !!}{!! $mess->LastName !!}"   draggable="true" ondragstart="drag(event)"  width="88" height="31">
+                        <img style="display: block; position: relative; border: 1px solid #c1c1c1;    border-radius: 10px; float: right; width: 65px; height: 65px;"  src="https://pp.vk.me/c631616/v631616713/1fbdb/a5idV46L-38.jpg">
+                        Lvl: <span>{!! $mess->getLvl['lvl'] !!}</span></br>
+                        Name:  <span>{!! $mess->FirstName !!}</span></br>
+                        LastName:  <span>{!! $mess->LastName !!}</span></br>
+                        Directions:  <span>{!! $mess->getSpeciality["speciality"]!!}</span></br>
+                        Time:  <span>{!! $mess->AvailablePerWeek!!}</span></br>
+                        Tags:  <span>{!! $mess->getTagSpeciality[0]->tag!!}</span></br>
+                        <input type="hidden" name="prog_id{!! $mess->id !!}" value="{!! $mess->id !!} ">
+                        <hr>
+                    </div>--}}
+                @endforeach
+            @endif
         </div>
     <form method="POST" action="http://localhost/diplom/public/distribution/post" accept-charset="UTF-8"><input name="_token" value="jnubEBtxw7yYXeCgBjjt4ztrmUP0HvxB2t7G7mAP" type="hidden">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -75,13 +91,54 @@
 <div class="col-sm-4"></div>
 <div class="row" style="margin-left: 40px; margin-top: -550px;">
     <select id="task_id" name="task_id" value="{{ csrf_token() }}">
-        @foreach($tasks as $task)
-            <option value="{!! $task->id !!}">{!! $task->task !!}</option>
-        @endforeach
+        @if(isset($distTask))
+            @foreach($distTask as $task)
+            <script>
+                var task_Check =document.getElementById("{!! $task->subject !!}");
+                if(task_Check != null)
+                    document.write("<option style='display:none'>");
+                else
+                    document.write("<option id='{!! $task->subject !!}' name='optTask' value='{!! $task->id !!}'>{!! $task->subject !!}</option>");
+            </script>
+            @endforeach
+        @endif
     </select>
+    @if(isset($distTask))
+        @foreach($distTask as $task)
+        <script>
+            $("#task_id").on('change', function() {
+                console.log($(this).find('option:selected').html());
+                if($(this).find('option:selected').html() == "{!! $task->subject !!}"){
+
+                }
+                else{
+
+                }
+            });
+        </script>
+        @endforeach
+    @endif
+    <div style="display: inline">
+         <h2 style="padding-left: 1100px">Task</h2>
+         <ul>
+             <li>Subject: {!! $task->subject  !!}</li>
+             <li>Description: </li>
+             <li>Priority: </li>
+             <li>Status: </li>
+             <li>Technologies: </li>
+             <li>Estimate: </li>
+         </ul>
+    </div>
     <button type="submit" class="btn btn-default col-sm-2" style="margin: 40px">Send</button>
 </div>
 </form>
+<script>
+    $("#task_id").on('change', function() {
+       console.log($(this).find('option:selected').html())
+
+    });
+</script>
+
 
 
 

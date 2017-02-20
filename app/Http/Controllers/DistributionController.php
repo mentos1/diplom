@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Developer;
 use App\Distribution;
-use App\Programmer;
-use App\Task;
+use App\DistTask;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DistributionController extends Controller
 {
@@ -21,45 +20,59 @@ class DistributionController extends Controller
                 ];*/
 
        //$msr =$ms[0]->id;
-        //dd(empty($ms));
+        //dd(empty($ms));*/
 
-        $mas = Task::all();
-        $result = array();
-        $iterator = 0;
-        foreach( $mas as $key => $val )
-        {
-            $ms = DB::select('select * from distributions where idTask = ?', [$mas[$iterator]->getAttributes()["id"]]);
-            if(empty($ms)){
-                $result[$key] = $val;
-            }
-            $iterator++;
-        }
-        //dd($result); // добавить в массив
-        $tasks = $result;
+    $Dis = Developer::all();
+    $result = array();
 
-        $mas = Programmer::all();
-        //dd($mas);
-        $result = array();
-        $iterator = 0;
-        foreach( $mas as $key => $val )
-        {
-            $ms = DB::select('select * from distributions where idProg = ?', [$mas[$iterator]->getAttributes()["id"]]);
-            if(empty($ms)){
-                $result[$key] = $val;
-            }
-            $iterator++;
-        }
-        $progs = $result;
-        $ms = DB::select('select * from distributions');
-        //dd($tasks);
-        //dd($arr_P);
+    foreach ($Dis as $dis) {
+        array_push($result,$dis->getTagSpeciality[0]->tag);
+    }
 
-        $date = [
-            'programmer' => $progs,
-            'tasks' => $tasks,
-            'count' => Programmer::count()
-        ];
+    $date = [
+        'distTask' => DistTask::all(),
+        'developer' => Developer::all()
+    ];
 
+    //dd($result);
+
+        /*        $mas = Task::all();
+                $result = array();
+                $iterator = 0;
+                foreach( $mas as $key => $val )
+                {
+                    $ms = DB::select('select * from distributions where idTask = ?', [$mas[$iterator]->getAttributes()["id"]]);
+                    if(empty($ms)){
+                        $result[$key] = $val;
+                    }
+                    $iterator++;
+                }
+                //dd($result); // добавить в массив
+                $tasks = $result;
+
+                $mas = Programmer::all();
+                //dd($mas);
+                $result = array();
+                $iterator = 0;
+                foreach( $mas as $key => $val )
+                {
+                    $ms = DB::select('select * from distributions where idProg = ?', [$mas[$iterator]->getAttributes()["id"]]);
+                    if(empty($ms)){
+                        $result[$key] = $val;
+                    }
+                    $iterator++;
+                }
+                $progs = $result;
+                $ms = DB::select('select * from distributions');
+                //dd($tasks);
+                //dd($arr_P);
+
+                $date = [
+                    'programmer' => $progs,
+                    'tasks' => $tasks,
+                    'count' => Programmer::count()
+                ];
+            */
         return view("distribution",$date);
     }
 

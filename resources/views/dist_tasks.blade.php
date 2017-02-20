@@ -36,17 +36,16 @@
     </ul>
 
         <div class="container">
-            <h2>Add programmer</h2>
-            <form method="POST" action="http://localhost/diplom/public/distTask/post" accept-charset="UTF-8"><input name="_token" value="bwHuZx6uuKLZqMkp5urONY7s9WP0HymQfk3UgXhB" type="hidden">
-
+            <h2>Add Task</h2>
+            <form method="POST" enctype="multipart/form-data" action="http://localhost/diplom/public/distTask/post" accept-charset="UTF-8">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group col-sm-10">
                     <label for="subject">Subject</label>
                     <input class="form-control" name="subject" id="subject" type="text">
                 </div>
-
                 <div class="form-group col-sm-10">
                     <label for="description">Description</label>
-                    <input name="description" id="description" type="file">
+                    <textarea class="form-control" rows="5" name="description" id="description"></textarea>
                 </div>
                 <div class="form-group col-sm-10" >
                     <label for="priority">Priority</label>
@@ -66,19 +65,25 @@
                 </div>
                 <div class="form-group col-sm-10">
                     @foreach($tag as $t)
-                        <div class="form-group col-sm-2">
-                            <label style="float: inherit" for="{!! $t->tag !!}">{!! $t->tag !!}</label>
-                            <input id="{!! $t->tag !!}" name="{!! $t->id !!}"  type="checkbox" class="form-control" value="{!! $t->id !!}"></hr>
-                        </div>
+                        @unless($t->tag == "none")
+                            <div class="form-group col-sm-2">
+                                    <label style="float: inherit" for="{!! $t->tag !!}">{!! $t->tag !!}</label>
+                                    <input id="{!! $t->tag !!}" name="{!! $t->id !!}"  type="checkbox" class="form-control" value="{!! $t->id !!}"></hr>
+                            </div>
+                        @endunless
                     @endforeach
                 </div>
-                <div class="form-group col-sm-10" >
+{{--                <div class="form-group col-sm-10" >
                     <label for="speciality">Speciality</label>
                     <select class="form-control" name="speciality" id="speciality">
                         @foreach($speciality as $spec)
                             <option value="{!! $spec->id !!}">{!! $spec->speciality !!}</option>
                         @endforeach
                     </select>
+                </div>--}}
+                <div class="form-group col-sm-10">
+                    <label style="float: inherit" for="estimate">Estimate</label>
+                    <input id="estimate" name="estimate"  type="number" min="5" max="40" class="form-control" value="40"></hr>
                 </div>
                 <div class="form-group col-sm-10">
                     <input class="btn btn-primary" value="Create" type="submit">
