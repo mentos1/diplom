@@ -26,6 +26,7 @@ Route::post('programmer/post',['uses' => "AddProgController@index", "as" => "Pos
 
 ///////////////////home////////////////
 Route::get('/',['uses' => "HomeController@index", "as" => "home"]);
+Route::post('/',['uses' => "HomeController@drop", "as" => "homeDrop"]);
 /////////////////////
 
 ////////////////task//////////////////
@@ -34,11 +35,12 @@ Route::post('/task/post',['uses' => "AddTaskController@index", "as" => "PostTask
 /////////////////////
 
 Route::get('/distribution',['uses' => "DistributionController@index", "as" => "distribution"]);
-Route::post('/distribution/post',['uses' => "DistributionController@index", "as" => "PostDistribution"]);
+Route::post('/distribution/edit',['uses' => "DistributionController@edit", "as" => "PostDistribution"]);
 
 
 Route::get('/statistics',['uses' => "StatisticsController@index", "as" => "statistics"]);
 Route::get('/distTask',['uses' => "DistTaskController@index", "as" => "DistTaskCont"]);
+Route::post('/distTask/drop',['uses' => "DistTaskController@drop", "as" => "PostDistTaskDrop"]);
 Route::post('distTask/post',['uses' => "DistTaskController@index", "as" => "PostDistTaskCont"]);
 
 $router->resource('programmer/post','AddProgController');

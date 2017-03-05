@@ -6,74 +6,161 @@ use App\Developer;
 use App\Distribution;
 use App\DistTask;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DistributionController extends Controller
 {
     public function index()
     {
-//orderBy('created_at','desc')->get()
-        /*        $date = [
-                    'title' => 'Гостевая книга Laravel 5.3',
-                    'page_title' => 'Гостевая книга',
-                    'messages' => Mymodel::latest()->paginate(1),
-                    'count' => Mymodel::count()
-                ];*/
+        /////////////////Tag Full Developer////////
+        $data_dist = 0;
+        $data_dev = 0;
+        $Dis = Developer::all();
+        $Distribution = Distribution::all();
+        $result_Developer = array();
+            foreach($Dis as $d){
+                foreach ($Distribution as $item){
+                    if($item->idProg == $d->id){
+                        $dd = new class
+                        {
+                        };
+                        $result_stc = array();
+                        $dd->id = $d->id;
+                        $dd->FirstName = $d->FirstName;
+                        $dd->LastName = $d->LastName;
+                        $dd->idSpeciality = Distribution::getIdSpeciality($d->idSpeciality)[0]->speciality;
+                        $dd->idLevel = Distribution::getIdLevel($d->idLevel)[0]->lvl;
+                        $dd->AvailablePerWeek = $d->AvailablePerWeek;
+                        foreach (Distribution::getDevelopers($d->id) as $dist) {
+                            array_push($result_stc, $dist->tag);
+                        }
+                        $dd->TagSpeciality = $result_stc;
+                        array_push($result_Developer, $dd);
+                    }
+                }
+            }
 
-       //$msr =$ms[0]->id;
-        //dd(empty($ms));*/
+        $no_repiat_dev = $result_Developer;
 
-    $Dis = Developer::all();
-    $result = array();
+        foreach($Dis as $d) {
+            $dd = new class
+            {
+            };
+            $result_stc = array();
+            $dd->id = $d->id;
+            $dd->FirstName = $d->FirstName;
+            $dd->LastName = $d->LastName;
+            $dd->idSpeciality = Distribution::getIdSpeciality($d->idSpeciality)[0]->speciality;
+            $dd->idLevel = Distribution::getIdLevel($d->idLevel)[0]->lvl;
+            $dd->AvailablePerWeek = $d->AvailablePerWeek;
+            foreach (Distribution::getDevelopers($d->id) as $dist) {
+                array_push($result_stc, $dist->tag);
+            }
+            $dd->TagSpeciality = $result_stc;
+            array_push($result_Developer, $dd);
+        }
 
-    foreach ($Dis as $dis) {
-        array_push($result,$dis->getTagSpeciality[0]->tag);
-    }
+        foreach ($no_repiat_dev as $elementKey => $element) {
+            foreach ($result_Developer as $valueKey => $value) {
+                if($element->id == $value->id){
+                    unset($result_Developer[$valueKey]);
+                }
+            }
+        }
 
-    $date = [
-        'distTask' => DistTask::all(),
-        'developer' => Developer::all()
+        $data_dev = $result_Developer;
+
+        /////////////////////////////////////////////////////////////
+        $Dis = DistTask::all();
+        $result_DistTask = array();
+        foreach($Dis as $d){
+                $dd = new class
+                {
+                };
+                $result_des = array();
+                $result_tech = array();
+                $dd->id = $d->id;
+                $dd->subject = $d->subject;
+                $dd->priority = $d->priority;
+                $dd->status = $d->status;
+                $dd->estimate = $d->estimate;
+                foreach (Distribution::getDistTasksIdDescription($d->description) as $dist) {
+                    array_push($result_des, $dist->description);
+                }
+                foreach (Distribution::getDistTasksIdTeches($d->technologies) as $dist) {
+                    array_push($result_tech, $dist->tag);
+                }
+                $dd->description = $result_des;
+                $dd->technologies = $result_tech;
+                array_push($result_DistTask, $dd);
+        }
+
+        $no_repiat_dev = $result_DistTask;
+
+        $result_DistTask = array();
+            foreach($Dis as $d){
+                foreach ($Distribution as $item) {
+                    if ($item->idTask == $d->id) {
+                        $dd = new class
+                        {
+                        };
+                        $result_des = array();
+                        $result_tech = array();
+                        $dd->id = $d->id;
+                        $dd->subject = $d->subject;
+                        $dd->priority = $d->priority;
+                        $dd->status = $d->status;
+                        $dd->estimate = $d->estimate;
+                        foreach (Distribution::getDistTasksIdDescription($d->description) as $dist) {
+                            array_push($result_des, $dist->description);
+                        }
+                        foreach (Distribution::getDistTasksIdTeches($d->technologies) as $dist) {
+                            array_push($result_tech, $dist->tag);
+                        }
+                        $dd->description = $result_des;
+                        $dd->technologies = $result_tech;
+                        array_push($result_DistTask, $dd);
+                    }
+                }
+            }
+        //dd($result_DistTask);
+
+        foreach ($no_repiat_dev as $elementKey => $element) {
+            foreach ($result_DistTask as $valueKey => $value) {
+                if($element->id == $value->id){
+                    unset($no_repiat_dev[$elementKey]);
+                }
+            }
+        }
+
+        $data_dist = $no_repiat_dev;
+
+    //dd(Distribution::getDevelopers());
+    //dd(Distribution::getJoin());
+    //dd(Distribution::getIdTaskIdDescriptions(16));
+    //dd(Distribution::getIdDevIdTag(25));
+    //dd(Distribution::getIdDisIdTag(19));
+
+
+        $task = DistTask::all();
+        $result = array();
+        $result_Prog = array();
+        $result_hhh = array();
+        $iterator = 0;
+
+        foreach($task as $tsk)
+        {
+            var_dump($tsk->getPriority());
+
+        }
+    dd($task);
+
+
+    $data = [
+        'distTask' => $data_dist,
+        'developer' => $data_dev,
     ];
-
-    //dd($result);
-
-        /*        $mas = Task::all();
-                $result = array();
-                $iterator = 0;
-                foreach( $mas as $key => $val )
-                {
-                    $ms = DB::select('select * from distributions where idTask = ?', [$mas[$iterator]->getAttributes()["id"]]);
-                    if(empty($ms)){
-                        $result[$key] = $val;
-                    }
-                    $iterator++;
-                }
-                //dd($result); // добавить в массив
-                $tasks = $result;
-
-                $mas = Programmer::all();
-                //dd($mas);
-                $result = array();
-                $iterator = 0;
-                foreach( $mas as $key => $val )
-                {
-                    $ms = DB::select('select * from distributions where idProg = ?', [$mas[$iterator]->getAttributes()["id"]]);
-                    if(empty($ms)){
-                        $result[$key] = $val;
-                    }
-                    $iterator++;
-                }
-                $progs = $result;
-                $ms = DB::select('select * from distributions');
-                //dd($tasks);
-                //dd($arr_P);
-
-                $date = [
-                    'programmer' => $progs,
-                    'tasks' => $tasks,
-                    'count' => Programmer::count()
-                ];
-            */
-        return view("distribution",$date);
+        return view("distribution",$data);
     }
 
     /**

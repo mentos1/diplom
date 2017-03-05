@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Developer;
+use App\Distribution;
+use App\DistTask;
 
 class HomeController extends Controller
 {
@@ -15,9 +18,22 @@ class HomeController extends Controller
                     'messages' => Mymodel::latest()->paginate(1),
                     'count' => Mymodel::count()
                 ];*/
+        $date = [
+            'distribution' => Distribution::all(),
+            'distTask' => DistTask::all(),
+            'developer' => Developer::all()
+        ];
+/*        foreach ($date['distribution'] as $item){
 
+        }*/
         return view("home");
     }
+
+    public function drop(Request $request, $id){
+        dd($request);
+        return view("index");
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -67,9 +83,10 @@ class HomeController extends Controller
      */
     public function edit($id)
     {
-        dd($id);
-        return view('messages.edit');
+        dd("dd");
     }
+
+
 
     /**
      * Update the specified resource in storage.

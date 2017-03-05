@@ -80,10 +80,12 @@
                     </div>
                     <div class="form-group col-sm-10">
                         @foreach($tag as $t)
-                            <div class="form-group col-sm-2">
-                                <label style="float: inherit" for="{!! $t->tag !!}">{!! $t->tag !!}</label>
-                                <input id="{!! $t->tag !!}" name="{!! $t->id !!}"  type="checkbox" class="form-control" value="{!! $t->id !!}"></hr>
-                            </div>
+                            @unless($t->tag == "none")
+                                <div class="form-group col-sm-2">
+                                    <label style="float: inherit" for="{!! $t->tag !!}">{!! $t->tag !!}</label>
+                                    <input id="{!! $t->tag !!}" name="{!! $t->id !!}"  type="checkbox" class="form-control" value="{!! $t->id !!}"></hr>
+                                </div>
+                            @endunless
                         @endforeach
                     </div>
                     <div class="form-group col-sm-10">
@@ -94,19 +96,15 @@
         </div>
         <div id="drop" class="tab-pane fade">
             <h2>Drop programmer</h2>
-            <form class="form-horizontal">
+            <form method="POST" class="form-horizontal" enctype="multipart/form-data" action="http://localhost/diplom/public/developer/drop" accept-charset="UTF-8">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label for="directions" class="control-label col-sm-2">Directions:</label>
                     <div class="col-sm-8">
-                        <select class="form-control" id="directions">
-                            @foreach($developer as $dev)
-                                <script>
-                                    var task_Check =document.getElementById("{!! $dev->FirstName !!}{!! $dev->LastName !!}");
-                                    if(task_Check != null)
-                                        document.write("<option style='display:none'>");
-                                    else
-                                        document.write("<option id='{!! $dev->FirstName !!}{!! $dev->LastName !!}' value='{!! $dev->id !!}'>");
-                                </script>{!! $dev->FirstName !!} {!! $dev->LastName !!}</option>
+                        <select name="DropDevId" class="form-control" id="directions">
+                            @foreach($data_dev as $dev){
+                                <option value="{{ $dev->id }}">{!! $dev->FirstName !!} {!! $dev->LastName !!}</option>
+                                }
                             @endforeach
                         </select>
                     </div>

@@ -58,28 +58,19 @@
         <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-sm-3">
             @if(isset($developer))
                 @foreach($developer as $mess)
-                    <script>
-                        var task_Check =document.getElementById("{!! $mess->FirstName !!}{!! $mess->LastName !!}");
-                        console.log(task_Check);
-                        if(task_Check != null) {
-                            document.write("<div style='display:none'></div>");
-                            var span = document.createElement('span');
-                            span.innerHTML = ", {!! $mess->getTagSpeciality[0]->tag!!}";
-                            document.getElementById("{!! $mess->FirstName !!}{!! $mess->LastName !!}").getElementsByTagName("span")[document.getElementById("{!! $mess->FirstName !!}{!! $mess->LastName !!}").getElementsByTagName("span").length - 1].appendChild(span);
-                        }else
-                            document.write("<div id='{!! $mess->FirstName !!}{!! $mess->LastName !!}'draggable='true' ondragstart='drag(event)'  width='88' height='31'><img style='display: block; position: relative; border: 1px solid #c1c1c1;    border-radius: 10px; float: right; width: 65px; height: 65px;'  src='https://pp.vk.me/c631616/v631616713/1fbdb/a5idV46L-38.jpg'>Lvl: <span>{!! $mess->getLvl['lvl'] !!}</span></br>Name:  <span>{!! $mess->FirstName !!}</span></br>LastName:  <span>{!! $mess->LastName !!}</span></br>Directions:  <span>{!! $mess->getSpeciality['speciality']!!}</span></br>Time:  <span>{!! $mess->AvailablePerWeek!!}</span></br>Tags:  <span>{!! $mess->getTagSpeciality[0]->tag!!}</span></br> <input type='hidden' name='prog_id{!! $mess->id !!}' value='{!! $mess->id !!}'> <hr> </div>");
-                    </script>
-                    {{--<div id="{!! $mess->FirstName !!}{!! $mess->LastName !!}"   draggable="true" ondragstart="drag(event)"  width="88" height="31">
-                        <img style="display: block; position: relative; border: 1px solid #c1c1c1;    border-radius: 10px; float: right; width: 65px; height: 65px;"  src="https://pp.vk.me/c631616/v631616713/1fbdb/a5idV46L-38.jpg">
-                        Lvl: <span>{!! $mess->getLvl['lvl'] !!}</span></br>
-                        Name:  <span>{!! $mess->FirstName !!}</span></br>
-                        LastName:  <span>{!! $mess->LastName !!}</span></br>
-                        Directions:  <span>{!! $mess->getSpeciality["speciality"]!!}</span></br>
-                        Time:  <span>{!! $mess->AvailablePerWeek!!}</span></br>
-                        Tags:  <span>{!! $mess->getTagSpeciality[0]->tag!!}</span></br>
-                        <input type="hidden" name="prog_id{!! $mess->id !!}" value="{!! $mess->id !!} ">
-                        <hr>
-                    </div>--}}
+                            <div id="{!! $mess->FirstName !!}{!! $mess->LastName !!}"   draggable="true" ondragstart="drag(event)"  width="88" height="31">
+                                <img style="display: block; position: relative; border: 1px solid #c1c1c1;    border-radius: 10px; float: right; width: 65px; height: 65px;"  src="">
+                                Name:  <span>{!! $mess->FirstName !!}</span></br>
+                                LastName:  <span>{!! $mess->LastName !!}</span></br>
+                                Speciality:  <span>{!! $mess->idSpeciality !!}</span></br>
+                                Level:  <span>{!! $mess->idLevel !!}</span></br>
+                                AvailablePerWeek:  <span>{!! $mess->AvailablePerWeek!!}</span></br>
+                                @foreach($mess->TagSpeciality as $tag)
+                                    TagSpeciality:<span>{!!$tag!!}</span></br>
+                                @endforeach
+                                <input type="hidden" name="prog_id{!! $mess->id !!}" value="{!! $mess->id !!} ">
+                                <hr>
+                            </div>
                 @endforeach
             @endif
         </div>
@@ -87,59 +78,49 @@
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
         <div id="div2" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-sm-3"></div>
-</div>
-<div class="col-sm-4"></div>
-<div class="row" style="margin-left: 40px; margin-top: -550px;">
-    <select id="task_id" name="task_id" value="{{ csrf_token() }}">
-        @if(isset($distTask))
-            @foreach($distTask as $task)
-            <script>
-                var task_Check =document.getElementById("{!! $task->subject !!}");
-                if(task_Check != null)
-                    document.write("<option style='display:none'>");
-                else
-                    document.write("<option id='{!! $task->subject !!}' name='optTask' value='{!! $task->id !!}'>{!! $task->subject !!}</option>");
-            </script>
-            @endforeach
-        @endif
-    </select>
-    @if(isset($distTask))
-        @foreach($distTask as $task)
-        <script>
-            $("#task_id").on('change', function() {
-                console.log($(this).find('option:selected').html());
-                if($(this).find('option:selected').html() == "{!! $task->subject !!}"){
+        </div>
+        <div class="col-sm-4"></div>
+        <div class="row" style="margin-left: 40px; margin-top: -550px;">
+            <select id="task_id" name="task_id" value="{{ csrf_token() }}">
+                @if(isset($distTask))
+                    @foreach($distTask as $task)
+                        <option value="{{ $task->id }}">{{ $task->subject }}</option>
+                    @endforeach
+                @endif
+            </select>
+            <div class="col-sm-4" style="margin-left: 440px; margin-top: -550px;">
+                    <ul class="nav nav-tabs">
+                        @if(isset($distTask))
+                            @foreach($distTask as $task)
+                                    <li><a href="#{{ $task->id }}">{{ $task->subject }}</a></li>
+                            @endforeach
+                        @endif
+                    </ul>
+                    <div class="tab-content well well-lg">
+                        @if(isset($distTask))
+                            @foreach($distTask as $task)
+                                <div id="{{ $task->id }}" class="tab-pane fade in active">
+                                    <div class="container">
+                                        <h3>{{ $task->subject }}</h3>
+                                        <p></p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+            </div>
+            <div id="forTasks"></div>
+            <button type="submit" class="btn btn-default col-sm-2" style="margin: 40px">Send</button>
+        </div>
+        </form>
 
-                }
-                else{
-
-                }
-            });
-        </script>
-        @endforeach
-    @endif
-    <div style="display: inline">
-         <h2 style="padding-left: 1100px">Task</h2>
-         <ul>
-             <li>Subject: {!! $task->subject  !!}</li>
-             <li>Description: </li>
-             <li>Priority: </li>
-             <li>Status: </li>
-             <li>Technologies: </li>
-             <li>Estimate: </li>
-         </ul>
-    </div>
-    <button type="submit" class="btn btn-default col-sm-2" style="margin: 40px">Send</button>
-</div>
-</form>
 <script>
-    $("#task_id").on('change', function() {
-       console.log($(this).find('option:selected').html())
-
+    $(document).ready(function(){
+        $(".nav-tabs a").click(function(){
+            $(this).tab('show');
+        });
     });
 </script>
-
-
 
 
 
