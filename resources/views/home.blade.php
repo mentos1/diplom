@@ -3,10 +3,12 @@
 <head>
     <title>Bootstrap Case</title>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 </head>
 <style>
     td > button{
@@ -40,87 +42,206 @@
         </ul>
     </div>
 </nav>
-<table class="table table-condensed">
-    <thead>
-    <tr>
-        <th>Subject</th>
-        <th>Description</th>
-        <th>Priority</th>
-        <th>Status</th>
-        <th>Technologies</th>
-        <th>Estimate</th>
-        <th>LastUpdate</th>
-        <th>Developers</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-        <script>
-            var a = -9;
-            var date_Db , dateDb;
-            var ms_update;
-            var date_Now = Date.parse(new Date());
-        </script>
-        @if(isset($distribution))
-            @foreach($distribution as $dist)
-                <script>
-                    var task_Check =document.getElementById("{!! $dist->getDistTask["subject"] !!}");
-                    if(task_Check == null) {
-                        dateDb = new Date("{!! $dist->updated_at !!}");
-                        date_Db = Date.parse(dateDb);
-                        ms_update = +"{!! $dist->getDistTask['estimate'] !!}" * 60 *60;
-                        console.log("Date Now: " + date_Now + ". Date Db: " + date_Db + ms_update + "ms_update: " + ms_update);
-                        document.write("<tr  id='{!! $dist->getDistTask['subject'] !!}'><td>{!! $dist->getDistTask['subject'] !!}</td><td>@foreach($distTask as $dTask)@if( $dist->getDistTask['description'] == $dTask->getDescription['id']){!! $dTask->getDescription['description'] !!}@break @endif @endforeach </td><td>@foreach($distTask as $dTask)@if( $dist->getDistTask['priority']  == $dTask->getPriority['id']){!! $dTask->getPriority['priority'] !!}@break @endif @endforeach </td><td>@foreach($distTask as $dTask)@if( $dist->getDistTask['status']  == $dTask->getStatus['id']){!! $dTask->getStatus['status'] !!}@break @endif @endforeach </td><td>@foreach($distTask as $dTask)@if( $dist->getDistTask['technologies']  == $dTask->getTechnologies['id'])<span>{!! $dTask->getTechnologies['tag'] !!}</span>@break @endif @endforeach </td><td>{!! $dist->getDistTask['estimate'] !!}</td><td>{!! $dist->updated_at !!}</td><td><span>{!! $dist->getDeveloper[0]['FirstName'] !!} {!! $dist->getDeveloper[0]['LastName'] !!}</span></td><td><button type='button' class='btn btn-danger'>Delet</button><button type='button' class='btn btn-info'>Update</button></td></tr>");
-                        if(date_Now <= ms_update + date_Db){
-                            $('#{!! $dist->getDistTask['subject'] !!}').attr("class","passive_Bg");
-                        }else {
-                            $('#{!! $dist->getDistTask['subject'] !!}').attr("class","active_Bg");
-                        }
-                        a = a + 9;
-                    }
-                    else{
-
-                        var span = document.createElement('span');
-                        var comma  = document.createElement('span');
-                        var comma1  = document.createElement('span');
-                        var span_name = document.createElement('span');
-                        var Span_Tag = document.getElementsByTagName("td")[4].getElementsByTagName("span");
-                        for(var i = 0; i < Span_Tag.length; i++){
-                            if(Span_Tag[i].innerHTML != "{!! $dTask->getTechnologies['tag']!!}"){
-                                span.innerHTML = "{!! $dTask->getTechnologies['tag']!!}";
-                                comma.innerHTML = " , ";
-                                document.getElementsByTagName("td")[4+a].appendChild(comma);
-                                document.getElementsByTagName("td")[4+a].appendChild(span);
-
-                            }
-                        }
-                        for(var i = 0; i < Span_Tag.length; i++){
-                            if(Span_Tag[i].innerHTML != "{!! $dist->getDeveloper[0]['FirstName'] !!} {!! $dist->getDeveloper[0]['LastName'] !!}"){
-                                comma1.innerHTML = " , ";
-                                span_name.innerHTML = "{!! $dist->getDeveloper[0]['FirstName'] !!} {!! $dist->getDeveloper[0]['LastName'] !!}";
-                                document.getElementsByTagName("td")[7+a].appendChild(comma1);
-                                document.getElementsByTagName("td")[7+a].appendChild(span_name);
-                            }
-                        }
-                    }
-                </script>
-            @endforeach
-        @endif
-
-    </tbody>
-</table>
-
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#active">Active</a></li>
+        <li><a href="#inExpect">inExpect</a></li>
+        <li><a href="#store">Store</a></li>
+    </ul>
+    <div class="tab-content well well-lg">
+        <div id="active" class="tab-pane fade in active">
+            <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Technologies</th>
+                <th>Estimate</th>
+                <th>LastUpdate</th>
+                <th>Developers</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @if(isset($distribution))
+                @foreach($distribution as $dist)
+                    @if($dist->case == "active")
+                        <tr  id='{!! $dist->subject !!}'>
+                        <td>{!! $dist->subject !!}</td>
+                        <td>@foreach($dist->description as $dTask)
+                                    {!! $dTask !!}
+                            @endforeach
+                        </td>
+                        <td>
+                            {!! $dist->priority !!}
+                        </td>
+                        <td>
+                            {!! $dist->status !!}
+                        </td>
+                        <td>
+                            @foreach($dist->technologies as $dTask)
+                                <span>{!! $dTask !!}</span>
+                            @endforeach
+                        </td>
+                        <td>{!! $dist->estimate !!}</td>
+                            <td><span>{!! $dist->updated_at !!}</span></td>
+                            <td>
+                                @foreach($dist->developers as $dDevelopers)
+                                    <span data-val="{{$dDevelopers->id}}">{!! $dDevelopers->FirstName !!} {!! $dDevelopers->LastName !!}</span>
+                                @endforeach
+                            </td>
+                            <td><button type='button' class='btn btn-danger' data-blok="active" value="{{$dist->id}}">Delet</button>
+                                <button type='button' class='btn btn-info' data-blok="active" value="{{$dist->id}}">Update</button></td>
+                        </tr>
+                    @endif
+                @endforeach
+            @endif
+            </tbody>
+        </table>
+</div>
+    <div id="store" class="tab-pane fade">
+            <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Technologies</th>
+                <th>Estimate</th>
+                <th>LastUpdate</th>
+                <th>Developers</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+                <tbody>
+                @if(isset($distribution))
+                    @foreach($distribution as $dist)
+                        @if($dist->case == "inexpect")
+                            <tr  id='{!! $dist->subject !!}'>
+                                <td>{!! $dist->subject !!}</td>
+                                <td>@foreach($dist->description as $dTask)
+                                        {!! $dTask !!}
+                                    @endforeach
+                                </td>
+                                <td>
+                                    {!! $dist->priority !!}
+                                </td>
+                                <td>
+                                    {!! $dist->status !!}
+                                </td>
+                                <td>
+                                    @foreach($dist->technologies as $dTask)
+                                        <span>{!! $dTask !!}</span>
+                                    @endforeach
+                                </td>
+                                <td>{!! $dist->estimate !!}</td>
+                                <td><span>{!! $dist->updated_at !!}</span></td>
+                                <td>
+                                    @foreach($dist->developers as $dDevelopers)
+                                        <span data-val="{{$dDevelopers->id}}">{!! $dDevelopers->FirstName !!} {!! $dDevelopers->LastName !!}</span>
+                                    @endforeach
+                                </td>
+                                <td><button type='button' class='btn btn-danger' data-blok="store" value="{{$dist->id}}">Delet</button>
+                                    <button type='button' class='btn btn-info' data-blok="store" value="{{$dist->id}}">Update</button></td>
+                            </tr>
+                        @endif
+                    @endforeach
+                @endif
+                </tbody>
+        </table>
+    </div>
+    <div id="inExpect" class="tab-pane fade">
+        <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Technologies</th>
+                <th>Estimate</th>
+                <th>LastUpdate</th>
+                <th>Developers</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @if(isset($distribution))
+                @foreach($distribution as $dist)
+                    @if($dist->case == "complete")
+                        <tr  id='{!! $dist->subject !!}'>
+                            <td>{!! $dist->subject !!}</td>
+                            <td>@foreach($dist->description as $dTask)
+                                    {!! $dTask !!}
+                                @endforeach
+                            </td>
+                            <td>
+                                {!! $dist->priority !!}
+                            </td>
+                            <td>
+                                {!! $dist->status !!}
+                            </td>
+                            <td>
+                                @foreach($dist->technologies as $dTask)
+                                    <span>{!! $dTask !!}</span>
+                                @endforeach
+                            </td>
+                            <td>{!! $dist->estimate !!}</td>
+                            <td><span>{!! $dist->updated_at !!}</span></td>
+                            <td>
+                            @foreach($dist->developers as $dDevelopers)
+                                <span data-val="{{$dDevelopers->id}}">{!! $dDevelopers->FirstName !!} {!! $dDevelopers->LastName !!}</span>
+                            @endforeach
+                            </td>
+                            <td><button type='button' class='btn btn-danger' data-blok="inExpect" value="{{$dist->id}}">Delet</button>
+                                <button type='button' class='btn btn-info' data-blok="inExpect" value="{{$dist->id}}">Update</button></td>
+                        </tr>
+                    @endif
+                @endforeach
+            @endif
+            </tbody>
+        </table>
+    </div>
 <script>
+
+    $(document).ready(function(){
+        $(".nav-tabs a").click(function(){
+            $(this).tab('show');
+        });
+    });
+
+
     $(".btn-danger").on("click", function (e) {
         var url = "http://localhost/diplom/public/";
+        var dev = [];
+        //console.log($($($($(this).parents("tr")[0]).find("td")[6]).find("span")[0]).html());
+        //console.log($($($(this).parents("tr")[0]).find("td")[7]).find("span"));
+        var data_tite = $($($($(this).parents("tr")[0]).find("td")[6]).find("span")[0]).html();
+        var mas_dev = $($($(this).parents("tr")[0]).find("td")[7]).find("span");
+
+
+        mas_dev.each(function(){
+            dev.push(this.getAttribute("data-val"));
+        });
+
         var data = {
-          subject: $(this).parents("tr").eq(0).find("td").eq(0).html()
+        "_token": "{{ csrf_token() }}",
+        "id": $(this).val(),
+        "idBlock": this.getAttribute("data-blok"),
+        "dev": dev,
+        "time_created_at": data_tite
         };
+        console.log(data);
+        //console.log(data);
         $.ajax({
-            url: url,
             type: "POST",
+            url: "http://localhost/diplom/public/",
             data: data,
-            beforeSend: function(xhr){xhr.setRequestHeader('X-CSRF-TOKEN', $("#token").attr('content'));},
+            dataType: 'json',
+            //beforeSend: function(xhr){xhr.setRequestHeader('X-CSRF-TOKEN', $("#token").attr('content'));},
             success: function (response) {
                 console.log("success")
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Developer;
 use App\Distribution;
+use Carbon\Carbon;
 use App\DistTask;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,40 @@ class DistributionController extends Controller
     public function index()
     {
         /////////////////Tag Full Developer////////
+        $time_now = Carbon::now();
+
+        $result = [];
+        $result_last = [];
+
+        //dd($data['distribution']);
+
+        // distributions
+        $distribution = DistTask::all();
+        foreach ($distribution as $item){
+            if(sizeof(Distribution::getDev($item->id)) > 0)
+                array_push($result, Distribution::getDev($item->id));
+        }
+
+        foreach ($result as $it) {
+            foreach ($it as $item) {
+                $task = Distribution::getTaskById($item->idTask)[0];
+                $dev = Distribution::getDevelopersById($item->idProg)[0];
+                $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
+                $time_create = Carbon::parse($item->created_at);
+                if(($time_create->timestamp + $time_estime) >= $time_now->timestamp){
+                    Distribution::updateDev($dev->id,1);
+                }else{
+                    if(Distribution::getStatus($task->status)[0]->status == "inqa" || Distribution::getStatus($task->status)[0]->status == "complete"){
+                        Distribution::updateTaskStatus($task->id,4); //incomplite
+                        Distribution::updateDev($dev->id,0);
+                    }else{
+                        Distribution::updateTaskStatus($task->id,5); //inexpect
+                        Distribution::updateDev($dev->id,0);
+                    }
+                }
+            }
+        }
+
         $data_dist = 0;
         $data_dev = 0;
         $Dis = Developer::all();
@@ -24,18 +59,20 @@ class DistributionController extends Controller
                         $dd = new class
                         {
                         };
-                        $result_stc = array();
-                        $dd->id = $d->id;
-                        $dd->FirstName = $d->FirstName;
-                        $dd->LastName = $d->LastName;
-                        $dd->idSpeciality = Distribution::getIdSpeciality($d->idSpeciality)[0]->speciality;
-                        $dd->idLevel = Distribution::getIdLevel($d->idLevel)[0]->lvl;
-                        $dd->AvailablePerWeek = $d->AvailablePerWeek;
-                        foreach (Distribution::getDevelopers($d->id) as $dist) {
-                            array_push($result_stc, $dist->tag);
+                        if($d->busy != 0) {
+                            $result_stc = array();
+                            $dd->id = $d->id;
+                            $dd->FirstName = $d->FirstName;
+                            $dd->LastName = $d->LastName;
+                            $dd->idSpeciality = Distribution::getIdSpeciality($d->idSpeciality)[0]->speciality;
+                            $dd->idLevel = Distribution::getIdLevel($d->idLevel)[0]->lvl;
+                            $dd->AvailablePerWeek = $d->AvailablePerWeek;
+                            foreach (Distribution::getDevelopers($d->id) as $dist) {
+                                array_push($result_stc, $dist->tag);
+                            }
+                            $dd->TagSpeciality = $result_stc;
+                            array_push($result_Developer, $dd);
                         }
-                        $dd->TagSpeciality = $result_stc;
-                        array_push($result_Developer, $dd);
                     }
                 }
             }
@@ -60,6 +97,7 @@ class DistributionController extends Controller
             array_push($result_Developer, $dd);
         }
 
+
         foreach ($no_repiat_dev as $elementKey => $element) {
             foreach ($result_Developer as $valueKey => $value) {
                 if($element->id == $value->id){
@@ -81,9 +119,8 @@ class DistributionController extends Controller
                 $result_tech = array();
                 $dd->id = $d->id;
                 $dd->subject = $d->subject;
-                $dd->priority = $d->priority;
-                $dd->status = $d->status;
-                $dd->estimate = $d->estimate;
+                $dd->priority = $d->getPriority["priority"];
+                $dd->status = $d->getStatus["status"];
                 foreach (Distribution::getDistTasksIdDescription($d->description) as $dist) {
                     array_push($result_des, $dist->description);
                 }
@@ -92,6 +129,7 @@ class DistributionController extends Controller
                 }
                 $dd->description = $result_des;
                 $dd->technologies = $result_tech;
+                $dd->estimate = $d->estimate;
                 array_push($result_DistTask, $dd);
         }
 
@@ -134,6 +172,14 @@ class DistributionController extends Controller
         }
 
         $data_dist = $no_repiat_dev;
+        $data_week = [];
+        $dt = Carbon::now();
+        for ($i=0; $i < 7; $i++){
+            array_push($data_week,$dt->format('l'));
+            $dt = $dt->addDay();
+        }
+
+        //dd($data_week);
 
     //dd(Distribution::getDevelopers());
     //dd(Distribution::getJoin());
@@ -142,24 +188,14 @@ class DistributionController extends Controller
     //dd(Distribution::getIdDisIdTag(19));
 
 
-        $task = DistTask::all();
-        $result = array();
-        $result_Prog = array();
-        $result_hhh = array();
-        $iterator = 0;
-
-        foreach($task as $tsk)
-        {
-            var_dump($tsk->getPriority());
-
-        }
-    dd($task);
-
 
     $data = [
+        'dataWeek' => $data_week,
         'distTask' => $data_dist,
         'developer' => $data_dev,
     ];
+
+
         return view("distribution",$data);
     }
 
@@ -190,6 +226,7 @@ class DistributionController extends Controller
             if ($key === "_token" || $key === "task_id") {
 
             } else {
+                Distribution::updateDev($val,1);
                 $result[$i] = $val;
                 $i++;
             }
@@ -202,13 +239,14 @@ class DistributionController extends Controller
         }
 
 
-
-        /* $arr = array();
+/*
+        $arr = array();
         for()
         array_push($arr,);
                $post = new Mymodel;
                 $post = $model->create($request-all());
                 $post->save();
+
         $msg = new Mymodel;
         $msg->name = $request->name;
         $msg->email = $request->email;

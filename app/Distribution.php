@@ -20,6 +20,34 @@ class Distribution extends Model
             ->get();
     }
 
+    public static function updateTaskStatus($id,$status){
+        DB::table('dist_tasks')
+            ->where('id', $id)
+            ->update(['status' => $status]);
+        return true;
+    }
+
+    public static function updateDev($id,$busy){
+        DB::table('developers')
+            ->where('id', $id)
+            ->update(['busy' => $busy]);
+        return true;
+    }
+
+
+
+    public static function getPriority($id){
+        return DB::table('priority_tasks')
+            ->where('id', $id)
+            ->get();
+    }
+
+    public static function getStatus($id){
+        return DB::table('status_tasks')
+            ->where('id', $id)
+            ->get();
+    }
+
 
     public static function getDevelopers($id){
         return DB::table('link_id_dev_id_tas')
@@ -41,6 +69,34 @@ class Distribution extends Model
             ->where('idDist', $id)
             ->get();
     }//mb first or last
+
+
+    ///////////////////////////////
+    public static function getDev($id){
+        return DB::table('distributions')
+            //->LeftJoin('developers', 'distributions.idProg', '=', 'developers.id')
+            ->where('idTask', $id)
+            ->get();
+    }
+
+    ///////////////////////////////
+    public static function getTaskById($id){
+        return DB::table('dist_tasks')
+            ->where('id', $id)
+            ->get();
+    }
+
+    ///////////////////////////////
+    public static function getDevelopersById($id){
+        return DB::table('developers')
+            ->where('id', $id)
+            ->get();
+    }
+
+
+
+
+
 
 
 

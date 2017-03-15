@@ -16,6 +16,16 @@
             border: 1px solid #949494;
             overflow-y: scroll;
         }
+        .weekends {
+            text-align: center;
+            padding: 10px;
+            background-color: #ad676a;
+
+        }
+        .workdays {
+            background-color: #ff6b59;
+
+        }
     </style>
     <script>
         function allowDrop(ev) {
@@ -25,12 +35,139 @@
         function drag(ev) {
             ev.dataTransfer.setData("text", ev.target.id);
         }
-
+        var hours = 0;
+        var i_for_tab = 0,b = true;
         function drop(ev) {
             ev.preventDefault();
-            var data = ev.dataTransfer.getData("text");
-            ev.target.appendChild(document.getElementById(data));
+            console.log(ev.target.getAttribute("id"));
+            if (ev.target.getAttribute("id") == "div1") {
+                var data = ev.dataTransfer.getData("text");
+                ev.target.appendChild(document.getElementById(data));
+                hours -= $(ev.dataTransfer.mozSourceNode).find(".AvailablePerWeek").eq(0).html();
+                $("tbody").find("td[class='workdays']").removeAttr("class");
+                i_for_tab = 0;
+                console.log($("tbody").find("td[class='workdays']"));
+                if (hours >= 8) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                    i_for_tab++;
+                }
+                if (hours >= 16) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                    i_for_tab++;
+                }
+                if (hours >= 24) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                    i_for_tab++;
+                }
+                if (hours >= 32) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                    i_for_tab++;
+                }
+                if (hours >= 40) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                }
+            }
+            if (ev.target.getAttribute("id") == "div2") {
+                var data = ev.dataTransfer.getData("text");
+                ev.target.appendChild(document.getElementById(data));
+                hours += +$(ev.dataTransfer.mozSourceNode).find(".AvailablePerWeek").eq(0).html();
+                console.log(hours);
+                //console.log($("tbody").find("td").eq(3).hasClass("weekends"));
+                if (hours >= 8) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                    i_for_tab++;
+                }
+                if (hours >= 16) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                    i_for_tab++;
+                }
+                if (hours >= 24) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                    i_for_tab++;
+                }
+                if (hours >= 32) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                    i_for_tab++;
+                }
+                if (hours >= 40) {
+                    while (b) {
+                        if ($("tbody").find("td").eq(i_for_tab).hasClass("weekends")) {
+                            i_for_tab++;
+                        } else {
+                            $("tbody").find("td").eq(i_for_tab).attr("class", "workdays");
+                            break;
+                        }
+                    }
+                }
+            }
         }
+
+
+
+
     </script>
 </head>
 <body>
@@ -64,7 +201,7 @@
                                 LastName:  <span>{!! $mess->LastName !!}</span></br>
                                 Speciality:  <span>{!! $mess->idSpeciality !!}</span></br>
                                 Level:  <span>{!! $mess->idLevel !!}</span></br>
-                                AvailablePerWeek:  <span>{!! $mess->AvailablePerWeek!!}</span></br>
+                                AvailablePerWeek:  <span class="AvailablePerWeek">{!! $mess->AvailablePerWeek!!}</span></br>
                                 @foreach($mess->TagSpeciality as $tag)
                                     TagSpeciality:<span>{!!$tag!!}</span></br>
                                 @endforeach
@@ -92,33 +229,82 @@
                     <ul class="nav nav-tabs">
                         @if(isset($distTask))
                             @foreach($distTask as $task)
-                                    <li><a href="#{{ $task->id }}">{{ $task->subject }}</a></li>
+                                    <li><a class="id_li" style="visibility: hidden" href="#{{ $task->id }}">{{ $task->subject }}</a></li>
                             @endforeach
                         @endif
                     </ul>
                     <div class="tab-content well well-lg">
                         @if(isset($distTask))
                             @foreach($distTask as $task)
-                                <div id="{{ $task->id }}" class="tab-pane fade in active">
-                                    <div class="container">
+                                <div id="{{ $task->id }}" class="tab-pane fade in">
                                         <h3>{{ $task->subject }}</h3>
-                                        <p></p>
-                                    </div>
+                                        <p>Priority: {{ $task->priority }}</p>
+                                        <p>Status: {{ $task->status }}</p>
+                                        @if(isset($task->description))
+                                            @foreach($task->description as $desc)
+                                                <p style="display:block; max-width: 400px; min-width: 30px;">Description: {{ $desc }}</p>
+                                            @endforeach
+                                        @endif
+                                        @if(isset($task->technologies))
+                                            @foreach($task->technologies as $tag)
+                                                <p>Tag: {{ $tag }}</p>
+                                            @endforeach
+                                        @endif
+                                        <p>Estimate: {{ $task->estimate }}</p>
                                 </div>
                             @endforeach
                         @endif
                     </div>
             </div>
             <div id="forTasks"></div>
-            <button type="submit" class="btn btn-default col-sm-2" style="margin: 40px">Send</button>
+            <button type="submit" class="btn btn-default col-sm-2">Send</button>
+            <div class="col-sm-4">
+                <table class="table" style="font-size: 12px !important;" width="100%">
+                    <thead>
+                        <tr>
+                            @if(isset($dataWeek))
+                                @foreach($dataWeek as $item)
+                                    <th>{{$item}}</th>
+                                @endforeach
+                            @else
+                                <th>Monday</th>
+                                <th>Tuesday</th>
+                                <th>Wednesday</th>
+                                <th>Thursday</th>
+                                <th>Friday</th>
+                                <th>Saturday</th>
+                                <th>Sunday</th>
+                            @endif
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            @foreach($dataWeek as $item)
+                                @if($item == "Saturday" || $item =="Sunday")
+                                    <td class="weekends"></td>
+                                @else
+                                    <td></td>
+                                @endif
+
+                            @endforeach
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         </form>
 
 <script>
     $(document).ready(function(){
+
         $(".nav-tabs a").click(function(){
             $(this).tab('show');
         });
+        $(".id_li").first().trigger('click').addClass('active');  // при загрузки автра выбор 1 пункта меню
+        $("#task_id").change(function (e) {
+            $('.id_li[href="#'+ $(this).find(":selected").val() +'"]').trigger('click').addClass('active');
+            console.log($(this).find(":selected").val());
+         });
     });
 </script>
 

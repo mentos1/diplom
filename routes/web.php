@@ -27,6 +27,7 @@ Route::post('programmer/post',['uses' => "AddProgController@index", "as" => "Pos
 ///////////////////home////////////////
 Route::get('/',['uses' => "HomeController@index", "as" => "home"]);
 Route::post('/',['uses' => "HomeController@drop", "as" => "homeDrop"]);
+Route::post('/update',['uses' => "HomeController@update", "as" => "homeDrop"]);
 /////////////////////
 
 ////////////////task//////////////////
