@@ -92,8 +92,13 @@
                                     <span data-val="{{$dDevelopers->id}}">{!! $dDevelopers->FirstName !!} {!! $dDevelopers->LastName !!}</span>
                                 @endforeach
                             </td>
-                            <td><button type='button' class='btn btn-danger' data-blok="active" value="{{$dist->id}}">Delet</button>
-                                <button type='button' class='btn btn-info' data-blok="active" value="{{$dist->id}}">Update</button></td>
+                            <td><button type='button' class='btn btn-danger' data-blok="active" value="{{$dist->id}}">Delete</button>
+                                <form method="POST" action="http://localhost/diplom/public/update/{{$dist->id}}" accept-charset="UTF-8">
+                                    <input name="_token" value="jnubEBtxw7yYXeCgBjjt4ztrmUP0HvxB2t7G7mAP" type="hidden">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <button type='submit' class='btn btn-info' data-blok="active" value="{{$dist->id}}">Update</button>
+                                </form>
+                            </td>
                         </tr>
                     @endif
                 @endforeach
@@ -101,7 +106,7 @@
             </tbody>
         </table>
 </div>
-    <div id="store" class="tab-pane fade">
+    <div id="inExpect" class="tab-pane fade">
             <table class="table table-condensed">
             <thead>
             <tr>
@@ -144,8 +149,13 @@
                                         <span data-val="{{$dDevelopers->id}}">{!! $dDevelopers->FirstName !!} {!! $dDevelopers->LastName !!}</span>
                                     @endforeach
                                 </td>
-                                <td><button type='button' class='btn btn-danger' data-blok="store" value="{{$dist->id}}">Delet</button>
-                                    <button type='button' class='btn btn-info' data-blok="store" value="{{$dist->id}}">Update</button></td>
+                                <td><button type='button' class='btn btn-danger' data-blok="store" value="{{$dist->id}}">Delete</button>
+                                    <form method="POST" action="http://localhost/diplom/public/distribution/{{$dist->id}}" accept-charset="UTF-8">
+                                        <input name="_token" value="jnubEBtxw7yYXeCgBjjt4ztrmUP0HvxB2t7G7mAP" type="hidden">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <button type='submit' class='btn btn-info' data-blok="store" value="{{$dist->id}}">Continue</button>
+                                    </form>
+                                </td>
                             </tr>
                         @endif
                     @endforeach
@@ -153,7 +163,7 @@
                 </tbody>
         </table>
     </div>
-    <div id="inExpect" class="tab-pane fade">
+    <div id="store" class="tab-pane fade">
         <table class="table table-condensed">
             <thead>
             <tr>
@@ -196,8 +206,7 @@
                                 <span data-val="{{$dDevelopers->id}}">{!! $dDevelopers->FirstName !!} {!! $dDevelopers->LastName !!}</span>
                             @endforeach
                             </td>
-                            <td><button type='button' class='btn btn-danger' data-blok="inExpect" value="{{$dist->id}}">Delet</button>
-                                <button type='button' class='btn btn-info' data-blok="inExpect" value="{{$dist->id}}">Update</button></td>
+                            <td><button type='button' class='btn btn-danger' data-blok="inExpect" value="{{$dist->id}}">Delete</button>
                         </tr>
                     @endif
                 @endforeach
@@ -252,6 +261,7 @@
         });
         //$(this).parents("tr")[0].remove();
     })
+
 </script>
 
 </body>
