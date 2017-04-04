@@ -27,7 +27,7 @@ class HomeController extends Controller
                     'count' => Mymodel::count()
                 ];*/
         $time_now = Carbon::now();
-
+        //dd($time_now);
         $result = [];
         $result_last = [];
 
@@ -44,7 +44,11 @@ class HomeController extends Controller
             foreach ($it as $item) {
                 $task = Distribution::getTaskById($item->idTask)[0];
                 $dev = Distribution::getDevelopersById($item->idProg)[0];
-                $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
+                if($task->estimate <= 8){
+                    $time_estime = ceil($task->estimate) * 60 * 60;
+                }else{
+                    $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
+                }
                 $time_create = Carbon::parse($item->created_at);
                 if(($time_create->timestamp + $time_estime) >= $time_now->timestamp){
                     Distribution::updateDev($dev->id,1);
@@ -53,7 +57,7 @@ class HomeController extends Controller
                         Distribution::updateTaskStatus($task->id,4); //incomplite
                         Distribution::updateDev($dev->id,0);
                     }else{
-                        Distribution::updateTaskStatus($task->id,5); //inexpect
+                        // Distribution::updateTaskStatus($task->id,5); //inexpect
                         Distribution::updateDev($dev->id,0);
                     }
                 }
@@ -78,8 +82,17 @@ class HomeController extends Controller
                     $result_des = array();
                     $result_tech = array();
                     $result_stc = array();
+                    $time_now = Carbon::now();
+
                     ///////////////////////////task////////////
                     if($b) {
+                        //dd($task);
+                        $time_create = Carbon::parse($item->created_at);
+                        if($task->estimate <= 8){
+                            $time_estime = ceil($task->estimate) * 60 * 60;
+                        }else{
+                            $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
+                        }
                         $dd->id = $task->id;
                         $dd->subject = $task->subject;
                         $dd->created_at = $item->created_at;
@@ -87,11 +100,11 @@ class HomeController extends Controller
                         $dd->priority = Distribution::getPriority($task->priority)[0]->priority;
                         $dd->status = Distribution::getStatus($task->status)[0]->status;
                         $dd->case = "active";
+                        if(($time_create->timestamp + $time_estime) <= $time_now->timestamp){
+                            $dd->case = "inexpect";
+                        }
                         if(Distribution::getStatus($task->status)[0]->status === "complete"){
                             $dd->case = "complete";
-                        }
-                        if(Distribution::getStatus($task->status)[0]->status === "inexpect"){
-                            $dd->case = "inexpect";
                         }
                         $dd->technologies = $task->technologies;
                         $dd->estimate = $task->estimate;
@@ -127,6 +140,7 @@ class HomeController extends Controller
             'distribution' => $result_last
         ];
 
+        //dd($data);
 
         return view("home",$data);
     }
@@ -308,7 +322,6 @@ class HomeController extends Controller
     public function continueTask(Request $request, $id){
         /////////////////Tag Full Developer////////
         $time_now = Carbon::now();
-
         $result = [];
         $result_last = [];
 

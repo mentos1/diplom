@@ -74,7 +74,6 @@
                             <button style="float: right;" type="button" class="btn glyphicon glyphicon glyphicon-remove btn-danger" onclick=""></button>
                             <button style="float: left;" type="button" class="btn glyphicon glyphicon-wrench btn-success "></button></div></td>
                 </tr>
-
         @endforeach
 
 

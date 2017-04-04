@@ -1,47 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Bootstrap Case</title>
-    <meta charset="utf-8">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+@extends('layouts.main')
 
-</head>
-<style>
-    td > button{
-       padding: 5px;
-       margin: 5px;
-    }
-    .passive_Bg{
-        background-color: #ad676a;
-    }
-    .active_Bg{
-        background-color: #75ad5e;
-    }
-</style>
-<body>
-
-<nav class="navbar navbar-inverse">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">DisProgOnTask</a>
-        </div>
-        <ul class="nav navbar-nav">
-            <li ><a href="//localhost/diplom/public/">Home</a></li>
-            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Add or Drop<span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <li class="active"><a href="programmer">Programmer</a></li>
-                    <li><a href="task">Task</a></li>
-                </ul>
-            </li>
-            <li><a href="//localhost/diplom/public/distribution">Distribution</a></li>
-            <li><a href="//localhost/diplom/public/statistics">Statistics</a></li>
-        </ul>
-    </div>
-</nav>
+@section('content')
 <div class="container">
     <ul class="nav nav-tabs">
         <li class="active"><a href="#active">Active</a></li>
@@ -150,7 +109,7 @@
                                     @endforeach
                                 </td>
                                 <td><button type='button' class='btn btn-danger' data-blok="store" value="{{$dist->id}}">Delete</button>
-                                    <form method="POST" action="http://localhost/diplom/public/distribution/{{$dist->id}}" accept-charset="UTF-8">
+                                    <form method="POST" action="http://localhost/diplom/public/distribution/send/{{$dist->id}}" accept-charset="UTF-8">
                                         <input name="_token" value="jnubEBtxw7yYXeCgBjjt4ztrmUP0HvxB2t7G7mAP" type="hidden">
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <button type='submit' class='btn btn-info' data-blok="store" value="{{$dist->id}}">Continue</button>
@@ -263,6 +222,4 @@
     })
 
 </script>
-
-</body>
-</html>
+@endsection

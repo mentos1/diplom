@@ -28,11 +28,16 @@ class DistributionController extends Controller
                 array_push($result, Distribution::getDev($item->id));
         }
 
+
         foreach ($result as $it) {
             foreach ($it as $item) {
                 $task = Distribution::getTaskById($item->idTask)[0];
+                if($task->estimate <= 8){
+                    $time_estime = ceil($task->estimate) * 60 * 60;
+                }else{
+                    $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
+                }
                 $dev = Distribution::getDevelopersById($item->idProg)[0];
-                $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
                 $time_create = Carbon::parse($item->created_at);
                 if(($time_create->timestamp + $time_estime) >= $time_now->timestamp){
                     Distribution::updateDev($dev->id,1);
@@ -41,7 +46,7 @@ class DistributionController extends Controller
                         Distribution::updateTaskStatus($task->id,4); //incomplite
                         Distribution::updateDev($dev->id,0);
                     }else{
-                        Distribution::updateTaskStatus($task->id,5); //inexpect
+                        //Distribution::updateTaskStatus($task->id,5); //inexpect
                         Distribution::updateDev($dev->id,0);
                     }
                 }
@@ -138,7 +143,15 @@ class DistributionController extends Controller
         $result_DistTask = array();
             foreach($Dis as $d){
                 foreach ($Distribution as $item) {
-                    if ($item->idTask == $d->id) {
+                    $task = Distribution::getTaskById($item->idTask)[0];
+                    $time_create = Carbon::parse($item->created_at);
+                    if($task->estimate <= 8){
+                        $time_estime = ceil($task->estimate) * 60 * 60;
+                    }else{
+                        $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
+                    }
+                    $time_create = Carbon::parse($item->created_at);
+                    if ($item->idTask == $d->id  && (($time_create->timestamp + $time_estime) >= $time_now->timestamp || $d->status == 4)) {
                         $dd = new class
                         {
                         };
@@ -161,7 +174,6 @@ class DistributionController extends Controller
                     }
                 }
             }
-        //dd($result_DistTask);
 
         foreach ($no_repiat_dev as $elementKey => $element) {
             foreach ($result_DistTask as $valueKey => $value) {
@@ -187,12 +199,15 @@ class DistributionController extends Controller
     //dd(Distribution::getIdDevIdTag(25));
     //dd(Distribution::getIdDisIdTag(19));
 
+        $distTaskController = new DistTaskController();
+
 
 
     $data = [
         'dataWeek' => $data_week,
         'distTask' => $data_dist,
         'developer' => $data_dev,
+        'distTaskController' => $distTaskController->index()->getData()
     ];
 
 
@@ -217,20 +232,36 @@ class DistributionController extends Controller
      */
     public function store(Request $request)
     {
-
+        //добавть проверить
         $answer = $request->all();
-        //dd($request->all());
         $result = array();
         $i = 0;
+        $b = false;
         foreach( $answer as $key => $val ) {
             if ($key === "_token" || $key === "task_id") {
-
+                $b = true;
             } else {
-                Distribution::updateDev($val,1);
-                $result[$i] = $val;
-                $i++;
+                if($b) {
+                    Distribution::updateDev($val, 1);
+                    $result[$i] = $val;
+                    $i++;
+                }
             }
         }
+
+        //update need
+        //поставить if разобратся мочему не добавляет
+
+        Distribution::where('idTask', $request->task_id)->delete();
+
+        $msg = DistTask::find($request->task_id);
+        if ($msg->status < 4)
+            $msg->status = $msg->status + 1;
+        $msg->save();
+
+
+
+
      for($i = 0; $i < count($result); $i++){
             $msg = new Distribution();
             $msg->idTask = $request->task_id;
