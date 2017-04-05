@@ -60,7 +60,7 @@
                         </select>
                     </div>
                     <div class="form-group col-sm-10">
-                        <input class="btn btn-primary" value="Create" type="submit">
+                        <input class="btn btn-primary" value="Create" type="submit" onClick="alert('The task has been added')">
                     </div>
                 </form>
             </div>

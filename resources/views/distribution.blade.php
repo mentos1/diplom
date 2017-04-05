@@ -18,6 +18,7 @@
                 var data = ev.dataTransfer.getData("text");
                 ev.target.appendChild(document.getElementById(data));
                 hours -= $(ev.dataTransfer.mozSourceNode).find(".AvailablePerWeek").eq(0).html();
+                $('#tDev').html(hours);
                 $("tbody").find("td[class='workdays']").removeAttr("class");
                 i_for_tab = 0;
                 console.log($("tbody").find("td[class='workdays']"));
@@ -80,7 +81,8 @@
                 var data = ev.dataTransfer.getData("text");
                 ev.target.appendChild(document.getElementById(data));
                 hours += +$(ev.dataTransfer.mozSourceNode).find(".AvailablePerWeek").eq(0).html();
-                console.log(hours);
+                console.log("time: " + hours);
+                $('#tDev').html(hours);
                 //console.log($("tbody").find("td").eq(3).hasClass("weekends"));
                 if (hours >= 8) {
                     while (b) {
@@ -137,6 +139,11 @@
                     }
                 }
             }
+            if(+$("#tDev").html() >= +$("#tTask").html()){
+                $("#check").val("true");
+            }else{
+                $("#check").val("false")
+            }
         }
     </script>
     <div class="row form-horizontal">
@@ -162,6 +169,7 @@
         <form method="POST" id="sendForm" action="http://localhost/diplom/public/distribution/post" accept-charset="UTF-8"></form>
         <input name="_token" form="sendForm" value="jnubEBtxw7yYXeCgBjjt4ztrmUP0HvxB2t7G7mAP" type="hidden">
         <input type="hidden" form="sendForm" name="_token" value="{{ csrf_token() }}">
+        <input type="hidden" form="sendForm" id="check"  name="check" value="false">
         <div id="div2" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-sm-3"></div>
         </div>
         <div class="col-sm-4"></div>
@@ -169,7 +177,7 @@
             <select id="task_id" name="task_id" form="sendForm">
                 @if(isset($distTask))
                     @foreach($distTask as $task)
-                        <option value="{{ $task->id }}">{{ $task->subject }}</option>
+                        <option value="{{ $task->id }}" data-tTime="{{ $task->estimate }}">{{ $task->subject }}</option>
                     @endforeach
                 @endif
             </select>
@@ -239,7 +247,7 @@
                             @endforeach
                         </tr>
                         <tr>
-                            <td colspan="7" style="text-align: center"><span id="tTask">40</span>h / <span id="tDev">40</span>h</td>
+                            <td colspan="7" style="text-align: center"><span id="tTask">_</span>h / <span id="tDev">_</span>h</td>
                         </tr>
                     </tbody>
                 </table>
@@ -258,7 +266,8 @@
         $(".id_li").first().trigger('click').addClass('active');  // при загрузки автра выбор 1 пункта меню
         $("#task_id").change(function (e) {
             $('.id_li[href="#'+ $(this).find(":selected").val() +'"]').trigger('click').addClass('active');
-            console.log($(this).find(":selected").val());
+            console.log($(this).find(":selected").attr("data-tTime"));
+            $("#tTask").html($(this).find(":selected").attr("data-tTime"));
          });
     });
 </script>

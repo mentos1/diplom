@@ -54,7 +54,7 @@
                         @endforeach
                     </div>
                     <div class="form-group col-sm-10">
-                        <input class="btn btn-primary" value="Create" type="submit">
+                        <input class="btn btn-primary" value="Create" type="submit" onClick="alert('The developer has been added')">
                     </div>
                 </form>
             </div>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-default">Submit</button>
+                        <button type="submit" class="btn btn-default" onClick="alert('The developer has been droped')">Submit</button>
                     </div>
                 </div>
             </form>

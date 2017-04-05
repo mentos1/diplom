@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Bootstrap Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-</head>
-<body>
+@extends('layouts.main')
 
+@section('content')
 <div class="container">
     <h2>Bordered Table</h2>
     <p>The .table-bordered class adds borders to a table:</p>
@@ -173,6 +163,8 @@
 
         console.log(data);
 
+
+
         $.ajax({
             type: "POST",
             url: "http://localhost/diplom/public/replace",
@@ -180,7 +172,8 @@
             dataType: 'json',
             //beforeSend: function(xhr){xhr.setRequestHeader('X-CSRF-TOKEN', $("#token").attr('content'));},
             success: function (response) {
-                console.log(response)
+                alert('The task has been updated');
+                window.location.href = document.referrer;
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -192,7 +185,4 @@
 
 
 </script>
-
-
-</body>
-</html>
+@endsection

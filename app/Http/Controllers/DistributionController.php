@@ -233,56 +233,57 @@ class DistributionController extends Controller
     public function store(Request $request)
     {
         //добавть проверить
-        $answer = $request->all();
-        $result = array();
-        $i = 0;
-        $b = false;
-        foreach( $answer as $key => $val ) {
-            if ($key === "_token" || $key === "task_id") {
-                $b = true;
-            } else {
-                if($b) {
-                    Distribution::updateDev($val, 1);
-                    $result[$i] = $val;
-                    $i++;
+
+        if($request->check == "true") {
+            $answer = $request->all();
+            $result = array();
+            $i = 0;
+            $b = false;
+            foreach ($answer as $key => $val) {
+                if ($key === "_token" || $key === "task_id" || $key === "check") {
+                    $b = true;
+                } else {
+                    if ($b) {
+                        Distribution::updateDev($val, 1);
+                        $result[$i] = $val;
+                        $i++;
+                    }
                 }
+            }
+
+            //update need
+            //поставить if разобратся мочему не добавляет
+
+            Distribution::where('idTask', $request->task_id)->delete();
+
+            $msg = DistTask::find($request->task_id);
+            if ($msg->status < 4)
+                $msg->status = $msg->status + 1;
+            $msg->save();
+
+         for($i = 0; $i < count($result); $i++){
+                $msg = new Distribution();
+                $msg->idTask = $request->task_id;
+                $msg->idProg = $result[$i];
+                $msg->save();
             }
         }
 
-        //update need
-        //поставить if разобратся мочему не добавляет
+        $this->index()->getData();
+        return view("distribution",$this->index()->getData());
+        /*
+                $arr = array();
+                for()
+                array_push($arr,);
+                       $post = new Mymodel;
+                        $post = $model->create($request-all());
+                        $post->save();
 
-        Distribution::where('idTask', $request->task_id)->delete();
-
-        $msg = DistTask::find($request->task_id);
-        if ($msg->status < 4)
-            $msg->status = $msg->status + 1;
-        $msg->save();
-
-
-
-
-     for($i = 0; $i < count($result); $i++){
-            $msg = new Distribution();
-            $msg->idTask = $request->task_id;
-            $msg->idProg = $result[$i];
-            $msg->save();
-        }
-
-
-/*
-        $arr = array();
-        for()
-        array_push($arr,);
-               $post = new Mymodel;
-                $post = $model->create($request-all());
-                $post->save();
-
-        $msg = new Mymodel;
-        $msg->name = $request->name;
-        $msg->email = $request->email;
-        $msg->message = $request->message;
-        $msg->save();*/
+                $msg = new Mymodel;
+                $msg->name = $request->name;
+                $msg->email = $request->email;
+                $msg->message = $request->message;
+                $msg->save();*/
     }
 
     /**
