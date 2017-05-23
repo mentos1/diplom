@@ -18,6 +18,10 @@
                         <input class="form-control" name="subject" id="subject" type="text">
                     </div>
                     <div class="form-group col-sm-10">
+                        <label for="project">Project</label>
+                        <input class="form-control" name="TagProject" id="project" type="text">
+                    </div>
+                    <div class="form-group col-sm-10">
                         <label for="description">Description</label>
                         <textarea class="form-control" rows="5" name="description" id="description"></textarea>
                     </div>
@@ -33,9 +37,7 @@
                         <label for="status">Status</label>
                         <select class="form-control" name="status" id="status">
                             @foreach($status as $stat)
-                                @unless($stat->status == "inexpect")
                                     <option value="{!! $stat->id !!}">{!! $stat->status!!}</option>
-                                @endunless
                             @endforeach
                         </select>
                     </div>

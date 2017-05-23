@@ -11,10 +11,67 @@ use Illuminate\Support\Facades\DB;
 
 class DistributionController extends Controller
 {
+    public function getDaysFormTime($date){
+        return floor($date/8);
+    }
+    public function getHoursFormTime($date){
+        return $date % 8;
+    }
+    public function dateFinishWorks($date_Create,$item){
+        if($date_Create->hour >= 18 || $date_Create->hour < 10){
+            $date_Create->hour =  10;
+        }
+        $addDays = $this->getDaysFormTime($item->estimate);
+        $addHours = $this->getHoursFormTime($item->estimate);
+        if($date_Create->hour + $addHours > 18){
+            $date_Create->hour =  10;
+            $addHours = ($date_Create->hour + $addHours) - 18;
+            $addDays++;
+        }
+        $date_Create->addDays($addDays)->addHours($addHours);
+        return $date_Create;
+    }
+
+    function findAllAvailablePerWeek($lastweek){
+        $Distribution = Distribution::all();
+        foreach($Distribution as $d) {
+            $data_create_at = Carbon::parse($d->created_at);
+            if($data_create_at->weekOfYear == $lastweek) {
+                $task = Distribution::getTaskById($d->idTask);
+                Distribution::updateDev($d->idProg,1);
+
+                $dev_AvailablePerWeek = Distribution::getAvailablePerWeek($d->idProg)->AvailablePerWeek;
+                Distribution::setAvailablePerWeek($d->idProg,$task[0]->estimate + $dev_AvailablePerWeek );
+            }
+        }
+    }
+
+    function weekGet(){
+        $date_from_DB  = Distribution::getWeek();
+        if($date_from_DB[0]->CountYears < (Carbon::now()->addHours(3)->year)){
+            Distribution::setWeek(Carbon::now()->addHours(3)->weekOfYear, Carbon::now()->addHours(3)->year);
+            Distribution::ClearAvailablePerWeek();
+            Distribution::ClearBusy();
+            $this->findAllAvailablePerWeek((Carbon::now()->addHours(3)->weekOfYear));
+        }else{
+            if($date_from_DB[0]->CountWeek < (Carbon::now()->addHours(3)->weekOfYear)){
+                Distribution::ClearAvailablePerWeek();
+                Distribution::ClearBusy();
+                $this->findAllAvailablePerWeek((Carbon::now()->addHours(3)->weekOfYear));
+                Distribution::setWeek(Carbon::now()->addHours(3)->weekOfYear, Carbon::now()->addHours(3)->year);
+
+            }
+        }
+        //if($date_from_DB->CountWeek <= (Carbon::now()->addHours(3)->weekOfYear))
+
+
+    }
+
+
     public function index()
     {
+        $this->weekGet();
         /////////////////Tag Full Developer////////
-        $time_now = Carbon::now();
 
         $result = [];
         $result_last = [];
@@ -29,94 +86,55 @@ class DistributionController extends Controller
         }
 
 
-        foreach ($result as $it) {
-            foreach ($it as $item) {
-                $task = Distribution::getTaskById($item->idTask)[0];
-                if($task->estimate <= 8){
-                    $time_estime = ceil($task->estimate) * 60 * 60;
-                }else{
-                    $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
-                }
-                $dev = Distribution::getDevelopersById($item->idProg)[0];
-                $time_create = Carbon::parse($item->created_at);
-                if(($time_create->timestamp + $time_estime) >= $time_now->timestamp){
-                    Distribution::updateDev($dev->id,1);
-                }else{
-                    if(Distribution::getStatus($task->status)[0]->status == "inqa" || Distribution::getStatus($task->status)[0]->status == "complete"){
-                        Distribution::updateTaskStatus($task->id,4); //incomplite
-                        Distribution::updateDev($dev->id,0);
-                    }else{
-                        //Distribution::updateTaskStatus($task->id,5); //inexpect
-                        Distribution::updateDev($dev->id,0);
-                    }
-                }
-            }
-        }
-
         $data_dist = 0;
         $data_dev = 0;
+        $result_Developer = [];
         $Dis = Developer::all();
         $Distribution = Distribution::all();
-        $result_Developer = array();
-            foreach($Dis as $d){
-                foreach ($Distribution as $item){
-                    if($item->idProg == $d->id){
-                        $dd = new class
-                        {
-                        };
-                        if($d->busy != 0) {
-                            $result_stc = array();
-                            $dd->id = $d->id;
-                            $dd->FirstName = $d->FirstName;
-                            $dd->LastName = $d->LastName;
-                            $dd->idSpeciality = Distribution::getIdSpeciality($d->idSpeciality)[0]->speciality;
-                            $dd->idLevel = Distribution::getIdLevel($d->idLevel)[0]->lvl;
-                            $dd->AvailablePerWeek = $d->AvailablePerWeek;
-                            foreach (Distribution::getDevelopers($d->id) as $dist) {
-                                array_push($result_stc, $dist->tag);
-                            }
-                            $dd->TagSpeciality = $result_stc;
-                            array_push($result_Developer, $dd);
-                        }
-                    }
-                }
-            }
-
-        $no_repiat_dev = $result_Developer;
 
         foreach($Dis as $d) {
-            $dd = new class
-            {
-            };
-            $result_stc = array();
-            $dd->id = $d->id;
-            $dd->FirstName = $d->FirstName;
-            $dd->LastName = $d->LastName;
-            $dd->idSpeciality = Distribution::getIdSpeciality($d->idSpeciality)[0]->speciality;
-            $dd->idLevel = Distribution::getIdLevel($d->idLevel)[0]->lvl;
-            $dd->AvailablePerWeek = $d->AvailablePerWeek;
-            foreach (Distribution::getDevelopers($d->id) as $dist) {
-                array_push($result_stc, $dist->tag);
-            }
-            $dd->TagSpeciality = $result_stc;
-            array_push($result_Developer, $dd);
-        }
-
-
-        foreach ($no_repiat_dev as $elementKey => $element) {
-            foreach ($result_Developer as $valueKey => $value) {
-                if($element->id == $value->id){
-                    unset($result_Developer[$valueKey]);
+            if($d->AvailablePerWeek < 40){
+                $dd = new class
+                {
+                };
+                $result_stc = array();
+                $dd->id = $d->id;
+                $dd->FirstName = $d->FirstName;
+                $dd->LastName = $d->LastName;
+                $dd->idSpeciality = Distribution::getIdSpeciality($d->idSpeciality)[0]->speciality;
+                $dd->idLevel = Distribution::getIdLevel($d->idLevel)[0]->lvl;
+                $dd->AvailablePerWeek = $d->AvailablePerWeek;
+                foreach (Distribution::getDevelopers($d->id) as $dist) {
+                    array_push($result_stc, $dist->tag);
                 }
+                $dd->DaysBeforeStart = 0;
+                $dd->HoursBeforeStart = 0;
+                foreach(DistTask::getTimeWhenTaskBeFree($d->id) as $dist){ //перебортасков  с массива распределения
+                    $date_Create = Carbon::parse($dist->created_at);
+                    $date_now = Carbon::now()->addHours(3);
+                    $items = DistTask::getActiveProg($dist->idTask); // получения по Тасков по айди
+                    foreach ($items as $item) {
+                            if ($item->status != 4 ){
+                                $date = $this->dateFinishWorks($date_Create, $item);
+                                //var_dump(Carbon::parse($dist->created_at) ." < ". Carbon::now()->addHours(3) ." && ". $date .">". Carbon::now()->addHours(3));
+                                if($date_Create <= $date_now && $date > $date_now) {
+                                    $dd->DaysBeforeStart = $date->day - $date_now->day;
+                                    $dd->HoursBeforeStart = $date->hour - 10;
+                                }
+                            }
+                        }
+                }
+                $dd->TagSpeciality = $result_stc;
+                array_push($result_Developer, $dd);
             }
         }
-
         $data_dev = $result_Developer;
 
         /////////////////////////////////////////////////////////////
         $Dis = DistTask::all();
         $result_DistTask = array();
         foreach($Dis as $d){
+            if ($d->status != 4 && count(Distribution::getDev($d->id)) == 0) {
                 $dd = new class
                 {
                 };
@@ -132,66 +150,15 @@ class DistributionController extends Controller
                 foreach (Distribution::getDistTasksIdTeches($d->technologies) as $dist) {
                     array_push($result_tech, $dist->tag);
                 }
+                $dd->TagProject = $d->TagProject;
                 $dd->description = $result_des;
                 $dd->technologies = $result_tech;
                 $dd->estimate = $d->estimate;
                 array_push($result_DistTask, $dd);
-        }
-
-        $no_repiat_dev = $result_DistTask;
-
-        $result_DistTask = array();
-            foreach($Dis as $d){
-                foreach ($Distribution as $item) {
-                    $task = Distribution::getTaskById($item->idTask)[0];
-                    $time_create = Carbon::parse($item->created_at);
-                    if($task->estimate <= 8){
-                        $time_estime = ceil($task->estimate) * 60 * 60;
-                    }else{
-                        $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
-                    }
-                    $time_create = Carbon::parse($item->created_at);
-                    if ($item->idTask == $d->id  && (($time_create->timestamp + $time_estime) >= $time_now->timestamp || $d->status == 4)) {
-                        $dd = new class
-                        {
-                        };
-                        $result_des = array();
-                        $result_tech = array();
-                        $dd->id = $d->id;
-                        $dd->subject = $d->subject;
-                        $dd->priority = $d->priority;
-                        $dd->status = $d->status;
-                        $dd->estimate = $d->estimate;
-                        foreach (Distribution::getDistTasksIdDescription($d->description) as $dist) {
-                            array_push($result_des, $dist->description);
-                        }
-                        foreach (Distribution::getDistTasksIdTeches($d->technologies) as $dist) {
-                            array_push($result_tech, $dist->tag);
-                        }
-                        $dd->description = $result_des;
-                        $dd->technologies = $result_tech;
-                        array_push($result_DistTask, $dd);
-                    }
-                }
-            }
-
-        foreach ($no_repiat_dev as $elementKey => $element) {
-            foreach ($result_DistTask as $valueKey => $value) {
-                if($element->id == $value->id){
-                    unset($no_repiat_dev[$elementKey]);
-                }
             }
         }
 
-        $data_dist = $no_repiat_dev;
-        $data_week = [];
-        $dt = Carbon::now();
-        for ($i=0; $i < 7; $i++){
-            array_push($data_week,$dt->format('l'));
-            $dt = $dt->addDay();
-        }
-
-        //dd($data_week);
+        $data_dist = $result_DistTask;
 
     //dd(Distribution::getDevelopers());
     //dd(Distribution::getJoin());
@@ -204,13 +171,10 @@ class DistributionController extends Controller
 
 
     $data = [
-        'dataWeek' => $data_week,
         'distTask' => $data_dist,
         'developer' => $data_dev,
         'distTaskController' => $distTaskController->index()->getData()
     ];
-
-
         return view("distribution",$data);
     }
 
@@ -224,6 +188,46 @@ class DistributionController extends Controller
         //
     }
 
+    public  function  checkTask(Request $request){
+        if ($request->isMethod('post')) {
+            $idTask = DistTask::find($request->idTask);
+            $arrDev = $request->dev;
+            $dataTime =  $request->dataTime;
+            $hoursTime =  $request->hoursTime;
+            $pieces_date = explode("/", $dataTime);
+            $pieces_time = explode(":", $hoursTime);
+
+            $date_Create = Carbon::create($pieces_date[2], $pieces_date[0], $pieces_date[1], $pieces_time[0], $pieces_time[1]);
+            $date_Create_T = Carbon::create($pieces_date[2], $pieces_date[0], $pieces_date[1], $pieces_time[0], $pieces_time[1]);
+            $before = $this->dateFinishWorks($date_Create, $idTask); // тут
+
+            $answer_AvailablePerWeek = true;
+            $answer_created_at = true;
+           for($i = 0; $i < count($arrDev); $i++){
+               $dev = Distribution::getDevelopersById($arrDev[$i]);
+               $availablePerWeek = $dev[0]->AvailablePerWeek;
+              if($availablePerWeek + ($idTask->estimate) / count($arrDev) <= 40){
+                   $answer_AvailablePerWeek = true;
+               } else{
+                   $answer_AvailablePerWeek = false;
+               }
+            }
+            for($i = 0; $i < count($arrDev); $i++){
+                $dev = Distribution::getDevFromDistribution($arrDev[$i]);
+                $createdAt = $dev[0]->created_at;
+                $data_created_at = Carbon::parse($createdAt);
+                if($date_Create_T < $data_created_at && $before > $data_created_at){
+                    $answer_created_at = true;
+                } else{
+                    $answer_created_at = false;
+                }
+            }
+            return response()->json(['$answer_AvailablePerWeek' => $answer_AvailablePerWeek , '$answer_created_at' => $answer_created_at ]);
+        }
+        return response()->json(['response' => false]);
+
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -234,13 +238,12 @@ class DistributionController extends Controller
     {
         //добавть проверить
 
-        if($request->check == "true") {
             $answer = $request->all();
             $result = array();
             $i = 0;
             $b = false;
             foreach ($answer as $key => $val) {
-                if ($key === "_token" || $key === "task_id" || $key === "check") {
+                if ($key === "_token" || $key === "task_id" || $key === "check" || $key === "data_send" || $key === "data_time") {
                     $b = true;
                 } else {
                     if ($b) {
@@ -250,24 +253,32 @@ class DistributionController extends Controller
                     }
                 }
             }
+            $Dist_task_estimate = DistTask::find($request->task_id)->estimate;
+            //Distribution::where('idTask', $request->task_id)->delete();
+            $AvailibelPerWeek = $Dist_task_estimate / count($result);
 
-            //update need
-            //поставить if разобратся мочему не добавляет
-
-            Distribution::where('idTask', $request->task_id)->delete();
-
+/*
             $msg = DistTask::find($request->task_id);
             if ($msg->status < 4)
                 $msg->status = $msg->status + 1;
-            $msg->save();
+            $msg->save();*/
+             for($i = 0; $i < count($result); $i++){
+                    $msg = new Distribution();
+                    $msg->idTask = $request->task_id;
+                    $msg->idProg = $result[$i];
+                    $pieces_date = explode("/", $request->data_send);
+                    $pieces_time = explode(":", $request->data_time);
+                    $msg->created_at = Carbon::create($pieces_date[2], $pieces_date[0], $pieces_date[1], $pieces_time[0], $pieces_time[1]);
+                    $msg->save();
 
-         for($i = 0; $i < count($result); $i++){
-                $msg = new Distribution();
-                $msg->idTask = $request->task_id;
-                $msg->idProg = $result[$i];
+             }
+
+            for($i = 0; $i < count($result); $i++){
+                $msg = Developer::find($result[$i]);
+                $msg->AvailablePerWeek += $AvailibelPerWeek;
                 $msg->save();
             }
-        }
+
 
         $this->index()->getData();
         return view("distribution",$this->index()->getData());
@@ -285,6 +296,57 @@ class DistributionController extends Controller
                 $msg->message = $request->message;
                 $msg->save();*/
     }
+
+
+    public function adviceTask(Request $request){
+        if ($request->isMethod('post')){
+            $msg = DistTask::find($request->id);
+            $result_tech = [];
+            $result_DistTask = [];
+            foreach (Distribution::getDistTasksIdTeches($msg->technologies) as $dist) {
+                array_push($result_tech, $dist->tag);
+            }
+            $msg = Developer::all();
+            foreach ($msg as $item) {
+                $result_stc = [];
+                $dd = new class
+                {
+                };
+                $dd->id = $item->id;
+                foreach (Distribution::getDevelopers($item->id) as $dist) {
+                    array_push($result_stc, $dist->tag);
+                }
+                $dd->tag = $result_stc;
+                array_push($result_DistTask, $dd);
+            }
+            $gCounter = 0;
+            foreach($result_DistTask as $it_Dev){
+                foreach ($result_tech as $it_Task){
+                    if (in_array($it_Task, $it_Dev->tag)) {
+                        $gCounter++;
+                    }
+                }
+                $it_Dev->counter = $gCounter;
+                $gCounter = 0;
+            }
+
+            for ($j = 0; $j < count($result_DistTask) - 1; $j++){
+                for ($i = 0; $i < count($result_DistTask) - $j - 1; $i++){
+                    // если текущий элемент больше следующего
+                    if ($result_DistTask[$i]->counter > $result_DistTask[$i + 1]->counter){
+                        // меняем местами элементы
+                        $tmp_var = $result_DistTask[$i + 1];
+                        $result_DistTask[$i + 1] = $result_DistTask[$i];
+                        $result_DistTask[$i] = $tmp_var;
+                    }
+                }
+            }
+
+
+            return response()->json(['response' => $result_DistTask]);
+        }
+    }
+
 
     /**
      * Display the specified resource.

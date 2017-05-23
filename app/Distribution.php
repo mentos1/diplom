@@ -78,6 +78,48 @@ class Distribution extends Model
             ->where('idTask', $id)
             ->get();
     }
+    public static function getWeek(){
+        return DB::table('week')
+            ->where('id', 1)
+            ->get();
+    }
+
+    public static function setWeek($week, $year){
+        return  DB::table('week')
+                ->where('id', 1)
+                ->update(['CountWeek' => $week,'CountYears' => $year]);
+    }
+
+    public static function ClearBusy(){
+        return DB::table('developers')->update(['busy' => 0]);
+    }
+
+    public static function ClearAvailablePerWeek(){
+        return  DB::table('developers')
+            ->update(['AvailablePerWeek' => 0]);
+    }
+
+    public static function setAvailablePerWeek($id, $time){
+        return DB::table('developers')
+            ->where('id', $id)
+            ->update(['AvailablePerWeek' => $time]);
+    }
+    public static function getAvailablePerWeek($id){
+        return DB::table('developers')
+            ->where('id', $id)
+            ->get();
+    }
+    public static function getDevFromDistribution($id){
+        return DB::table('distributions')
+            //->LeftJoin('developers', 'distributions.idProg', '=', 'developers.id')
+            ->where('idProg', $id)
+            ->get();
+    }
+
+
+
+
+
 
     ///////////////////////////////
     public static function getTaskById($id){
@@ -92,14 +134,6 @@ class Distribution extends Model
             ->where('id', $id)
             ->get();
     }
-
-
-
-
-
-
-
-
 
  /*   public static function getJoin(){
       return  $users = DB::table('distributions')

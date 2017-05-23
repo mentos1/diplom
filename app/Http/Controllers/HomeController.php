@@ -17,6 +17,41 @@ use App\TagSpeciality;
 
 class HomeController extends Controller
 {
+    public function createTask($dd, $task){
+        $result_des = [];
+        $result_tech = [];
+        $dd->id = $task->id;
+        $dd->subject = $task->subject;
+        $dd->project = $task->TagProject;
+        $dd->priority = Distribution::getPriority($task->priority)[0]->priority;
+        $dd->status = Distribution::getStatus($task->status)[0]->status;
+        $dd->technologies = $task->technologies;
+        $dd->estimate = $task->estimate;
+        foreach (Distribution::getDistTasksIdDescription($task->description) as $dist) {
+            array_push($result_des, $dist->description);
+        }
+        foreach (Distribution::getDistTasksIdTeches($task->technologies) as $dist) {
+            array_push($result_tech, $dist->tag);
+        }
+        $dd->description = $result_des;
+        $dd->technologies = $result_tech;
+        return $dd;
+    }
+    public function createDev($d,$dev){
+        $result_stc = [];
+        $d->id = $dev->id;
+        $d->FirstName = $dev->FirstName;
+        $d->LastName = $dev->LastName;
+        $d->idSpeciality = Distribution::getIdSpeciality($dev->idSpeciality)[0]->speciality;
+        $d->idLevel = Distribution::getIdLevel($dev->idLevel)[0]->lvl;
+        $d->AvailablePerWeek = $dev->AvailablePerWeek;
+        foreach (Distribution::getDevelopers($dev->id) as $dist) {
+            array_push($result_stc, $dist->tag);
+        }
+        $d->TagSpeciality = $result_stc;
+        return $d;
+    }
+
     public function index()
     {
 //orderBy('created_at','desc')->get()
@@ -26,8 +61,6 @@ class HomeController extends Controller
                     'messages' => Mymodel::latest()->paginate(1),
                     'count' => Mymodel::count()
                 ];*/
-        $time_now = Carbon::now();
-        //dd($time_now);
         $result = [];
         $result_last = [];
 
@@ -39,111 +72,187 @@ class HomeController extends Controller
             if(sizeof(Distribution::getDev($item->id)) > 0)
             array_push($result, Distribution::getDev($item->id));
         }
-
         foreach ($result as $it) {
             foreach ($it as $item) {
                 $task = Distribution::getTaskById($item->idTask)[0];
-                $dev = Distribution::getDevelopersById($item->idProg)[0];
-                if($task->estimate <= 8){
-                    $time_estime = ceil($task->estimate) * 60 * 60;
-                }else{
-                    $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
-                }
-                $time_create = Carbon::parse($item->created_at);
-                if(($time_create->timestamp + $time_estime) >= $time_now->timestamp){
-                    Distribution::updateDev($dev->id,1);
-                }else{
-                    if(Distribution::getStatus($task->status)[0]->status == "inqa" || Distribution::getStatus($task->status)[0]->status == "complete"){
-                        Distribution::updateTaskStatus($task->id,4); //incomplite
-                        Distribution::updateDev($dev->id,0);
-                    }else{
-                        // Distribution::updateTaskStatus($task->id,5); //inexpect
-                        Distribution::updateDev($dev->id,0);
-                    }
+                $date_Create = Carbon::parse($item->created_at);
+                $date_Create_T = Carbon::parse($item->created_at);
+                $date_Finish = (new DistributionController())->dateFinishWorks($date_Create,$task);
+                $date_now = Carbon::now()->addHours(3);
+                if($date_Finish->timestamp < $date_now->timestamp){
+                    $msg = DistTask::find($task->id);
+                    $msg->status = 4;
+                    $msg->save();
                 }
             }
         }
 
 
 
-        $b = true;
-        foreach ($result as $it) {
+        $arrCreatedTask = [];
+/*        foreach ($result as $it) {
             $b = true;
             $result_dev = [];
             $dd = new class
             {
             };
             foreach ($it as $item) {
-                    $task = Distribution::getTaskById($item->idTask)[0];
-                    $dev = Distribution::getDevelopersById($item->idProg)[0];
-                    $d = new class
-                    {
-                    };
-                    $result_des = array();
-                    $result_tech = array();
-                    $result_stc = array();
-                    $time_now = Carbon::now();
+                $task = Distribution::getTaskById($item->idTask)[0];
+                $dev = Distribution::getDevelopersById($item->idProg)[0];
+                $d = new class
+                {
+                };
+                $createdTask = new class
+                {
+                };
+                $counte_status  = 0;
+                $result_des = array();
+                $result_tech = array();
+                $result_stc = array();
+                $time_now = Carbon::now();
 
-                    ///////////////////////////task////////////
-                    if($b) {
-                        //dd($task);
-                        $time_create = Carbon::parse($item->created_at);
-                        if($task->estimate <= 8){
-                            $time_estime = ceil($task->estimate) * 60 * 60;
-                        }else{
-                            $time_estime = ceil($task->estimate / 8) * 24 * 60 *60;
+
+                if(!$b){
+                    foreach ($arrCreatedTask  as $it_CreatedTask){
+                        if($it_CreatedTask->id === $task->id){
+                            foreach ($it_CreatedTask->status as $it_stat){
+                                if($task->status == $it_stat){
+                                    $counte_status++;
+                                }
+                            }
+                            if($counte_status == 0){
+                                array_push($it_CreatedTask->status,$task->status);
+                            }else{
+
+                            }
+                            $counte_status = 0;
+                            /*if(in_array($task->status,$it_CreatedTask->status)){
+                                // add new dev
+                            }else{
+                                array_push($createdTask->status,$task->status);
+                            }
                         }
-                        $dd->id = $task->id;
-                        $dd->subject = $task->subject;
-                        $dd->created_at = $item->created_at;
-                        $dd->updated_at = $item->updated_at;
-                        $dd->priority = Distribution::getPriority($task->priority)[0]->priority;
-                        $dd->status = Distribution::getStatus($task->status)[0]->status;
-                        $dd->case = "active";
-                        if(($time_create->timestamp + $time_estime) <= $time_now->timestamp){
-                            $dd->case = "inexpect";
-                        }
-                        if(Distribution::getStatus($task->status)[0]->status === "complete"){
-                            $dd->case = "complete";
-                        }
-                        $dd->technologies = $task->technologies;
-                        $dd->estimate = $task->estimate;
-                        foreach (Distribution::getDistTasksIdDescription($task->description) as $dist) {
-                            array_push($result_des, $dist->description);
-                        }
-                        foreach (Distribution::getDistTasksIdTeches($task->technologies) as $dist) {
-                            array_push($result_tech, $dist->tag);
-                        }
-                        $dd->description = $result_des;
-                        $dd->technologies = $result_tech;
-                        $b = false;
+
                     }
-                    /////////////////////////////dev////////////
-                    $d->id= $dev->id;
-                    $d->FirstName = $dev->FirstName;
-                    $d->LastName = $dev->LastName;
-                    $d->idSpeciality = Distribution::getIdSpeciality($dev->idSpeciality)[0]->speciality;
-                    $d->idLevel = Distribution::getIdLevel($dev->idLevel)[0]->lvl;
-                    $d->AvailablePerWeek = $dev->AvailablePerWeek;
-                    foreach (Distribution::getDevelopers($dev->id) as $dist) {
-                        array_push($result_stc, $dist->tag);
+                }
+
+
+
+                ///////////////////////////task////////////
+                if ($b) {
+                    //dd($task);
+
+                    $time_create = Carbon::parse($item->created_at);
+                    if ($task->estimate <= 8) {
+                        $time_estime = ceil($task->estimate) * 60 * 60;
+                    } else {
+                        $time_estime = ceil($task->estimate / 8) * 24 * 60 * 60;
                     }
-                    $d->TagSpeciality = $result_stc;
+                    $dd->id = $task->id;
+                    $dd->subject = $task->subject;
+                    $dd->created_at = $item->created_at;
+
+                    $createdTask->id = $task->id;
+                    $createdTask->status = [];
+                    array_push($createdTask->status,$task->status);
+                    $createdTask->created_at = $task->created_at;
+
+                    array_push($arrCreatedTask, $createdTask);
+                    $dd->updated_at = $item->updated_at;
+                    $dd->priority = Distribution::getPriority($task->priority)[0]->priority;
+                    $dd->status = Distribution::getStatus($task->status)[0]->status;
+                    $dd->case = "active";
+                    if (($time_create->timestamp + $time_estime) <= $time_now->timestamp) {
+                        $dd->case = "inexpect";
+                    }
+                    if (Distribution::getStatus($task->status)[0]->status === "complete") {
+                        $dd->case = "complete";
+                    }
+                    $dd->technologies = $task->technologies;
+                    $dd->estimate = $task->estimate;
+                    foreach (Distribution::getDistTasksIdDescription($task->description) as $dist) {
+                        array_push($result_des, $dist->description);
+                    }
+                    foreach (Distribution::getDistTasksIdTeches($task->technologies) as $dist) {
+                        array_push($result_tech, $dist->tag);
+                    }
+                    $dd->description = $result_des;
+                    $dd->technologies = $result_tech;
+                    $b = false;
+                }
+
+                /////////////////////////////dev////////////
+                $d->id = $dev->id;
+                $d->FirstName = $dev->FirstName;
+                $d->LastName = $dev->LastName;
+                $d->idSpeciality = Distribution::getIdSpeciality($dev->idSpeciality)[0]->speciality;
+                $d->idLevel = Distribution::getIdLevel($dev->idLevel)[0]->lvl;
+                $d->AvailablePerWeek = $dev->AvailablePerWeek;
+                foreach (Distribution::getDevelopers($dev->id) as $dist) {
+                    array_push($result_stc, $dist->tag);
+                }
+                $d->TagSpeciality = $result_stc;
                 array_push($result_dev, $d);
             }
             $dd->developers = $result_dev;
             array_push($result_last, $dd);
-        }
-        //dd($result_last);
+        }*/
 
+
+        $result_last = [];
+        foreach ($result as $it) {
+            $b = true;
+            $prepere_task  = 0;
+            $result_dev = [];
+            $task = null;
+            $return_Task = null;
+            foreach ($it as $item) {
+                    if($b){
+                        $task = Distribution::getTaskById($item->idTask)[0];
+                        $dd = new class
+                        {
+                        };
+                        $prepere_task = $item->created_at;
+                        $return_Task = $this->createTask($dd,$task);
+                        $date_Create = Carbon::parse($item->created_at);
+                        $return_Task->created_at = $item->created_at;
+                        $dist_Class = new DistributionController();
+                        $return_Task->finish_at = $dist_Class->dateFinishWorks($date_Create,$return_Task)->toDateTimeString();
+                    }else{
+                        $time_create_created_at = Carbon::parse($item->created_at)->timestamp;
+                        $time_create_prepere_task = Carbon::parse($prepere_task)->timestamp;
+                        if($time_create_created_at !== $time_create_prepere_task && $time_create_created_at !== $time_create_prepere_task+1 && $time_create_created_at !== $time_create_prepere_task+2 && $time_create_created_at !== $time_create_prepere_task+3) {
+                            $return_Task->developers = $result_dev;
+                            array_push($result_last, $return_Task);
+                            $result_dev = [];
+                            $task = Distribution::getTaskById($item->idTask)[0];
+                            $dd = new class
+                            {
+                            };
+                            $prepere_task = $item->created_at;
+                            $return_Task = $this->createTask($dd,$task);
+                        }
+                    }
+
+                    $d = new class
+                    {
+                    };
+                    $dev = Distribution::getDevelopersById($item->idProg)[0];
+                    array_push($result_dev,  $this->createDev($d,$dev));
+                    $b = false;
+            }
+            $return_Task->developers = $result_dev;
+            array_push($result_last, $return_Task);
+        }
         $data = [
             'distribution' => $result_last
         ];
 
-        //dd($data);
-
         return view("home",$data);
     }
+
+
+
 
     public function drop(Request $request){
         if ($request->isMethod('post')){
@@ -321,7 +430,7 @@ class HomeController extends Controller
 
     public function continueTask(Request $request, $id){
         /////////////////Tag Full Developer////////
-        $time_now = Carbon::now();
+        $time_now = Carbon::now()->addHours(3);
         $result = [];
         $result_last = [];
 
@@ -347,7 +456,7 @@ class HomeController extends Controller
                         Distribution::updateTaskStatus($task->id,4); //incomplite
                         Distribution::updateDev($dev->id,0);
                     }else{
-                        Distribution::updateTaskStatus($task->id,5); //inexpect
+                        //Distribution::updateTaskStatus($task->id,5); //inexpect
                         Distribution::updateDev($dev->id,0);
                     }
                 }
@@ -445,8 +554,7 @@ class HomeController extends Controller
         $result_DistTask = array();
         foreach($Dis as $d){
             foreach ($Distribution as $item) {
-                if ($item->idTask == $d->id) {
-                    if($d->status != 5 || $d->id != $id) {
+                    if($d->id != $id) {
                         $dd = new class
                         {
                         };
@@ -467,7 +575,6 @@ class HomeController extends Controller
                         $dd->technologies = $result_tech;
                         array_push($result_DistTask, $dd);
                     }
-                }
             }
         }
 
@@ -480,11 +587,10 @@ class HomeController extends Controller
             }
         }
 
-        //dd($no_repiat_dev);
 
         $data_dist = $no_repiat_dev;
         $data_week = [];
-        $dt = Carbon::now();
+        $dt = Carbon::now()->addHours(3);
         for ($i=0; $i < 7; $i++){
             array_push($data_week,$dt->format('l'));
             $dt = $dt->addDay();

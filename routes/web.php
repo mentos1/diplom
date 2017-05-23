@@ -37,6 +37,8 @@ Route::post('/replace',['uses' => "HomeController@replace", "as" => "homeDrop"])
 Route::get('/distribution',['uses' => "DistributionController@index", "as" => "distribution"]);
 Route::post('/distribution/edit',['uses' => "DistributionController@edit", "as" => "PostDistribution"]);
 Route::post('/distribution/post',['uses' => "DistributionController@store", "as" => "StoreDistribution"]);
+Route::post('/distribution/advice/{id}',['uses' => "DistributionController@adviceTask", "as" => "AdviceTask"]);
+Route::post('/distribution/checkTask',['uses' => "DistributionController@checkTask", "as" => "CheckTask"]);
 
 
 Route::get('/statistics',['uses' => "StatisticsController@index", "as" => "statistics"]);
