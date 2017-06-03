@@ -244,14 +244,79 @@ class HomeController extends Controller
             $return_Task->developers = $result_dev;
             array_push($result_last, $return_Task);
         }
+
+        $projects = DistTask::select(['TagProject'])->get();
+        $arr_progs = [];
+
+        foreach ($projects as $it){
+            array_push($arr_progs,$it);
+        }
+
+        $unique_arr_progs = array_unique($arr_progs);
+        $main_answer_for_paint_canvas = [];
+        foreach ($unique_arr_progs as $it){
+            $arr_project_name = Distribution::getCreate_at_by_TagProject($it->TagProject);
+            $arr_stack_for_val = [];
+            foreach ($arr_project_name as $it1){
+                    $dist = Distribution::getDevFromDistribution($it1->id);
+                    foreach ($dist as $itemDev){
+                        if(isset($itemDev)) {
+                            $task = Distribution::getTaskById($itemDev->idTask);
+                            $date_Create = Carbon::parse($itemDev->created_at);
+                            $date_Create_T = Carbon::parse($itemDev->created_at);
+                            $date_now = Carbon::now()->addHours(3);
+                            $date = (new DistributionController)->dateFinishWorks($date_Create, $task[0]);
+                            //var_dump($date_now->weekOfYear ."==".$date_Create_T->weekOfYear. "==" . $date->weekOfYear);
+                            if (($date_now->weekOfYear == $date_Create_T->weekOfYear || $date->weekOfYear == $date_now->weekOfYear) ||
+                                ($date_now->addWeek()->weekOfYear == $date_Create_T->weekOfYear || $date->addWeek()->weekOfYear == $date_now->weekOfYear)) {
+                                //dd($date_now->weekOfYear ."==".$date_Create_T->weekOfYear. "==" . $date->weekOfYear);
+                                $task[0]->finish_at = $date->toDateTimeString();
+                                $check_add_Task = true;
+                                $task[0]->created_at = $date_Create_T->toDateTimeString();
+                                $obj =new class{};
+                                $obj->subject =  $task[0]->subject;
+                                $obj->TagProject =  $task[0]->TagProject;
+                                $obj->finish_at = $date->toDateTimeString();
+                                $obj->created_at = $date_Create_T->toDateTimeString();
+                                if(count($main_answer_for_paint_canvas) == 0) {
+                                    array_push($main_answer_for_paint_canvas, $obj);
+                                }else{
+                                    foreach ($main_answer_for_paint_canvas as $it){
+                                        if($it->subject == $obj->subject && $obj->TagProject == $obj->TagProject)
+                                            $check_add_Task = false;
+                                    }
+                                    if($check_add_Task){
+                                        array_push($main_answer_for_paint_canvas, $obj);
+                                    }
+                                }
+                            }
+                        }
+                    }
+            }
+            //$main_answer_for_paint_canvas_unique = array_unique($main_answer_for_paint_canvas);
+            //dd($main_answer_for_paint_canvas);
+           /* if(count($arr_stack_for_val) != 0){
+                array_push($main_answer_for_paint_canvas, $arr_stack_for_val);
+            }*/
+        }
+
         $data = [
-            'distribution' => $result_last
+            'distribution' => $result_last,
+            'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas,
         ];
+        //dd($data);
 
         return view("home",$data);
     }
 
-
+    function objectToarray($data)
+    {
+        $array = (array)$data;
+        foreach($array as $key => &$field){
+            if(is_object($field))$field = $this->objectToarray($field);
+        }
+        return $array;
+    }
 
 
     public function drop(Request $request){
@@ -607,7 +672,6 @@ class HomeController extends Controller
 
 
         $data = [
-            'dataWeek' => $data_week,
             'distTask' => $data_dist,
             'developer' => $data_dev,
         ];

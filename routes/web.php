@@ -18,6 +18,8 @@
 //тоже что и prog
 Route::get('/developer',['uses' => "DevelopersController@index", "as" => "AddDevCont"]);
 Route::post('/developer/post',['uses' => "DevelopersController@index", "as" => "PostDevCont"]);
+Route::post('/developer/update/{id}',['uses' => "DevelopersController@update", "as" => "PostDevUpdate"]);
+Route::post('/developer/replaceDev',['uses' => "DevelopersController@replace", "as" => "replaceDev"]);
 
 
 Route::get('/programmer',['uses' => "AddProgController@index", "as" => "AddProg"]);

@@ -9,13 +9,6 @@ class AddTaskController extends Controller
 {
     public function index()
     {
-/*   $task = Task::latest();
-    dd($task);*/
-//orderBy('created_at','desc')->get()
-          $date = [
-              'messages' => Task::latest()->paginate(1),
-              'count' => Task::count()
-          ];
 
         return view("task");
     }

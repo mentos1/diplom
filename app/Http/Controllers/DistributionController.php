@@ -28,6 +28,7 @@ class DistributionController extends Controller
             $addHours = ($date_Create->hour + $addHours) - 18;
             $addDays++;
         }
+
         $date_Create->addDays($addDays)->addHours($addHours);
         return $date_Create;
     }
@@ -111,16 +112,26 @@ class DistributionController extends Controller
                 $dd->HoursBeforeStart = 0;
                 foreach(DistTask::getTimeWhenTaskBeFree($d->id) as $dist){ //перебортасков  с массива распределения
                     $date_Create = Carbon::parse($dist->created_at);
+                    $date_Create_T = Carbon::parse($dist->created_at);
                     $date_now = Carbon::now()->addHours(3);
                     $items = DistTask::getActiveProg($dist->idTask); // получения по Тасков по айди
                     foreach ($items as $item) {
                             if ($item->status != 4 ){
                                 $date = $this->dateFinishWorks($date_Create, $item);
-                                //var_dump(Carbon::parse($dist->created_at) ." < ". Carbon::now()->addHours(3) ." && ". $date .">". Carbon::now()->addHours(3));
-                                if($date_Create <= $date_now && $date > $date_now) {
-                                    $dd->DaysBeforeStart = $date->day - $date_now->day;
-                                    $dd->HoursBeforeStart = $date->hour - 10;
-                                }
+                                /*var_dump($date ." < ". $date_now);
+                                var_dump($date->timestamp < $date_now->timestamp);
+
+                                dd($date->dayOfWeek);*/
+                                if($date_Create_T->dayOfWeek < $date->dayOfWeek)
+                                    $date->addWeekdays(1);
+
+                                if($date->dayOfWeek == 6 || $date->dayOfWeek == 0)
+                                    $date->addDays(2);
+
+                                    if($date_Create_T->timestamp < $date_now->timestamp && $date->timestamp > $date_now->timestamp) {
+                                        $dd->DaysBeforeStart = $date->dayOfYear - $date_now->dayOfYear;
+                                        $dd->HoursBeforeStart = $date->hour - 10;
+                                    }
                             }
                         }
                 }
@@ -203,6 +214,7 @@ class DistributionController extends Controller
 
             $answer_AvailablePerWeek = true;
             $answer_created_at = true;
+            $answer_weeked = true;
            for($i = 0; $i < count($arrDev); $i++){
                $dev = Distribution::getDevelopersById($arrDev[$i]);
                $availablePerWeek = $dev[0]->AvailablePerWeek;
@@ -213,16 +225,30 @@ class DistributionController extends Controller
                }
             }
             for($i = 0; $i < count($arrDev); $i++){
+                if(count(Distribution::getDevFromDistribution($arrDev[$i])) != 0)
                 $dev = Distribution::getDevFromDistribution($arrDev[$i]);
-                $createdAt = $dev[0]->created_at;
-                $data_created_at = Carbon::parse($createdAt);
-                if($date_Create_T < $data_created_at && $before > $data_created_at){
-                    $answer_created_at = true;
-                } else{
-                    $answer_created_at = false;
+                for ($j = 0; $j < count($dev); $j++) {
+                    $createdAt = $dev[$j]->created_at;
+                    $data_created_at_T = Carbon::parse($createdAt);
+                    $data_created_at = Carbon::parse($createdAt);
+                    $before_T = $this->dateFinishWorks($data_created_at, DistTask::find($dev[$j]->idTask));
+                    if ($date_Create_T > $before_T  ||  $before < $data_created_at_T) {
+                        $answer_created_at = true;
+                    } else {
+                        $answer_created_at = false;
+                    }
                 }
             }
-            return response()->json(['$answer_AvailablePerWeek' => $answer_AvailablePerWeek , '$answer_created_at' => $answer_created_at ]);
+            $week_day_of_week = $date_Create_T->dayOfWeek;
+            if($week_day_of_week == 6 || $week_day_of_week == 0){
+                $answer_weeked = false;
+            }
+
+
+
+
+
+            return response()->json(['$answer_AvailablePerWeek' => $answer_AvailablePerWeek, '$answer_created_at' => $answer_created_at, 'weeked' => $answer_weeked]);
         }
         return response()->json(['response' => false]);
 

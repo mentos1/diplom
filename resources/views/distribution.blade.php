@@ -45,7 +45,9 @@
         <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)" style="position: relative; z-index: 3" class="col-sm-3">
             @if(isset($developer))
                 @foreach($developer as $mess)
-                            <div id="{!! $mess->FirstName !!}{!! $mess->LastName !!}" draggable="true" ondrop="drop(event)" ondragstart="drag(event)"  width="88" height="31">
+                    <form method="POST" id="updateFormDev{{$mess->id}}" action="http://localhost/diplom/public/developer/update/{{$mess->id }}" accept-charset="UTF-8"></form>
+                    <input type="hidden" form="updateFormDev{{$mess->id}}" name="_token" value="{{ csrf_token() }}">
+                    <div id="{!! $mess->FirstName !!}{!! $mess->LastName !!}" draggable="true" ondrop="drop(event)" ondragstart="drag(event)"  width="88" height="31">
                                 Name:  <span>{!! $mess->FirstName !!}</span></br>
                                 LastName:  <span>{!! $mess->LastName !!}</span></br>
                                 Speciality:  <span>{!! $mess->idSpeciality !!}</span></br>
@@ -60,6 +62,7 @@
                                         Will busy<span class="busyTime" style="color:green; font-size: 1.2em"> <span class="days">{!! $mess->DaysBeforeStart !!}</span>d : <span class="hours">{!! $mess->HoursBeforeStart !!}</span>h</span>
                                     @endif
                                 <input type="hidden"  form="sendForm" name="prog_id{!! $mess->id !!}" value="{!! $mess->id !!}">
+                                <button type='submit' style="float: right" form="updateFormDev{{$mess->id}}" class='btn btn-inf' data-blok="active" value="{{$mess->id}}">Update</button>
                                 <hr>
                             </div>
                 @endforeach
@@ -140,21 +143,21 @@
          });
 
 
+        var check_task = true
         $("#sendFormBut").click(function (e) {
-            e.preventDefault();
+            //e.preventDefault();
             var arr = $('#div2').children();
             var devArr = [];
-            for(var i =0; i < arr.length; i++){
+            for (var i = 0; i < arr.length; i++) {
                 devArr.push(+($(arr[i]).find("input").val()));
             }
-
 
             var data = {
                 "_token": "{{ csrf_token() }}",
                 "idTask": $("select").find(":selected").val(),
                 "dev": devArr,
-                "dataTime" : $("#datepicker").val(),
-                "hoursTime" : $(".timepicker").val()
+                "dataTime": $("#datepicker").val(),
+                "hoursTime": $(".timepicker").val()
             };
             console.log(data);
             $.ajax({
@@ -164,9 +167,23 @@
                 dataType: 'json',                    // тип загружаемых данных
                 success: function (data) { // вешаем свой обработчик на функцию success
                     console.log(data);
+                    if (data.$answer_AvailablePerWeek == false) {
+                        alert("У программиста не осталось свободных часов на этой неделе.");
+                    }
+                    if (data.$answer_created_at == false) {
+                        alert("На время этой задачи программист будет занят на друой задичи. Выберите другого програмиста.");
+                    }
+                    if (data.weeked == false) {
+                        alert("Вы питаетесь начать с выходного дня.");
+                    }
+                    if (data.$answer_AvailablePerWeek == true && data.$answer_created_at == true && data.weeked == true) {
+                        //b = false;
+                        //this.click;
+                    }
                 }
             });
         });
+
 
         $("#getAdvice").click(function (e) {
 

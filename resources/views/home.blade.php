@@ -7,6 +7,12 @@
         Your browser does not support the HTML5 canvas tag.
     </canvas>
     <script>
+        Date.prototype.addDays = function(days) {
+            var dat = new Date(this.valueOf());
+            dat.setDate(dat.getDate() + days);
+            return dat;
+        }
+
         function getWeekNumber(d) {
             // Copy date so don't modify original
             d = new Date(+d);
@@ -23,8 +29,8 @@
         }
 
         var locations = [
-                @foreach ($distribution as $it)
-                        ["{{ $it->project }}","{{ $it->subject }}","{{ $it->created_at }}","{{ $it->finish_at}}"],
+                @foreach ($mainAnswerPaintCanvas as $it)
+                        ["{{ $it->TagProject }}","{{ $it->subject }}","{{ $it->created_at }}","{{ $it->finish_at}}"],
                 @endforeach
         ];
         var count_Pr = 0;
@@ -33,31 +39,34 @@
 
         var pr = null;
         var obj = {};
+        console.log(locations);
         for(var i = 0; i < locations.length; i++){
-            if(pr != locations[i][0]){
+            if(pr !== locations[i][0]){
                 pr = locations[i][0];
-                if (getWeekNumber(new Date()) + 1 == getWeekNumber(new Date(locations[i][2])) || getWeekNumber(new Date())[1] == getWeekNumber(new Date(locations[i][2]))[1]) {
                     count_Pr++;
                     arr_pr.push(locations[i][0]);
-                }
             }
         }
+        console.log(count_Pr);
+        pr = null;
         var arr_all_pr =[];
         count_Pr = 0;
 
         for(var i = 0; i <= locations.length; i++){
+
+
             if(i == locations.length){
                 arr_all_pr.push(arr_obj);
                 break;
             }
 
             if(pr != locations[i][0]){
-                if(arr_obj.length != 0)
-                arr_all_pr.push(arr_obj);
+                if(arr_obj.length != 0){
+                    arr_all_pr.push(arr_obj);
+                }
                 count_Pr++;
-
-                arr_obj = []
-                if (getWeekNumber(new Date()) + 1 == getWeekNumber(new Date(locations[i][2])) || getWeekNumber(new Date())[1] == getWeekNumber(new Date(locations[i][2]))[1]) {
+                arr_obj = [];
+                //if (getWeekNumber(new Date()) + 1 == getWeekNumber(new Date(locations[i][2])) || getWeekNumber(new Date())[1] == getWeekNumber(new Date(locations[i][2]))[1]) {
                     //alert(getWeekNumber(new Date())[1] == getWeekNumber(new Date(locations[i][2]))[1]);
                     var answer_obj = function () {
                         var obj = {};
@@ -67,10 +76,10 @@
                         return obj;
                     };
                     arr_obj.push(answer_obj());
-                }
+                //}
                 pr = locations[i][0];
             }else {
-                if (getWeekNumber(new Date())[1] + 1 == getWeekNumber(new Date(locations[i][2]))[1] || getWeekNumber(new Date())[1] == getWeekNumber(new Date(locations[i][2]))[1]){
+                //if (getWeekNumber(new Date())[1] + 1 == getWeekNumber(new Date(locations[i][2]))[1] || getWeekNumber(new Date())[1] == getWeekNumber(new Date(locations[i][2]))[1]){
                     var answer_obj = function () {
                         var obj = {};
                         obj.subject = locations[i][1];
@@ -80,8 +89,7 @@
                     };
                     arr_obj.push(answer_obj());
                 }
-            }
-
+            //}
         }
 
         var amountProjects = count_Pr;
@@ -93,7 +101,7 @@
         var app = {};
         // the total area of our drawings, can be very large now
         app.WIDTH = 2320;
-        alert(amountProjects);
+        //alert(amountProjects);
         app.HEIGHT = 200*amountProjects;
 
 
@@ -150,7 +158,7 @@
             ctx.stroke();
 
             var underLine = 50;
-            for(var i = 1; i < amountProjects; i++){
+            for(var i = 1; i <= amountProjects; i++){
                ctx.beginPath();
                ctx.lineWidth = 1;
                ctx.strokeStyle = "#e3e3e3";
@@ -160,7 +168,7 @@
                ctx.lineTo(app.WIDTH,yBlock * i + underLine);
                ctx.stroke();
                     var glass = arr_all_pr[i-1];
-                    console.log(glass);
+                    //console.log(glass);
                     if(glass != undefined) {
                         for (var jx = 0; jx < glass.length; jx++) {
                             ctx.beginPath();
@@ -168,9 +176,9 @@
                             ctx.lineCap = "round";
                             ctx.strokeStyle = "red";
                             var start = parseTime(new Date(glass[jx].created_at), maxWidth);
-                            console.log(start);
+                            //console.log(start);
                             var finish = parseTime(new Date(glass[jx].finish_at), maxWidth);
-                            console.log(finish);
+                            //console.log(finish);
                             //var step = (yBlock * i + 50 - yBlock * (i-1) + 45) /  glass.length;
                             var step = 10;
                             ctx.moveTo(start, (yBlock * (i - 1) + underLine) + step * (jx + 1));
@@ -183,7 +191,7 @@
             }
 
             var result_now_time = parseTime(new Date(),maxWidth);
-            console.log("now" + result_now_time);
+            //console.log("now" + result_now_time);
 
 
            ctx.beginPath();

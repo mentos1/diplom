@@ -34,6 +34,14 @@ class Distribution extends Model
         return true;
     }
 
+    public static function getCreate_at_by_TagProject($TagProject){
+        return DB::table('dist_tasks')
+            ->where('TagProject', $TagProject)
+            ->get();
+    }
+
+
+
 
 
     public static function getPriority($id){
