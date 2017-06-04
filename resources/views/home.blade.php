@@ -412,10 +412,21 @@
             }
         };
 
-        function parseTime(data,maxWidth) {
-            var time_Now = (data.getTime() + 259200000) % 604800000;
-            var answer_now_time = time_Now * 100 /604800000;
-            return  answer_now_time * maxWidth /100;
+        function parseTime(date,maxWidth) {
+
+            var sizeOneDayOfPx = maxWidth / (9 * 7);
+            var day_of_week = date.getDay();
+            var add_day = date.getHours();
+
+            if(day_of_week !== 0 && day_of_week !== 6){
+                var day = (((day_of_week - 1) * 9) + add_day) * sizeOneDayOfPx;
+                alert(date);
+                alert(day);
+                var time_Now = (date.getTime() + 259200000) % 604800000;
+                var answer_now_time = time_Now * 100 /604800000;
+                //return  answer_now_time * maxWidth /100;
+                return  day;
+            }
         }
 
         var mouseWheel = function(e) {
