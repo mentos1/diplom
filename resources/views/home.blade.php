@@ -3,10 +3,18 @@
 @section('content')
 
 <div class="container">
-    <canvas id="myCanvas" width="1140" height="300" style="border:1px solid #e3e3e3; background-color: #f5f5f5; border-radius: 20px">
+    <canvas id="myCanvas" width="1140" height="300"  style="border:1px solid #e3e3e3; background-color: #f5f5f5; border-radius: 20px">
         Your browser does not support the HTML5 canvas tag.
     </canvas>
     <script>
+        var obj_arr = [];
+        Date.prototype.getWeekNumber = function(){
+            var d = new Date(+this);
+            d.setHours(0,0,0,0);
+            d.setDate(d.getDate()+4-(d.getDay()||7));
+            return Math.ceil((((d-new Date(d.getFullYear(),0,1))/8.64e7)+1)/7);
+        };
+
         Date.prototype.addDays = function(days) {
             var dat = new Date(this.valueOf());
             dat.setDate(dat.getDate() + days);
@@ -97,7 +105,7 @@
         console.dir(arr_all_pr);
         var canvas = document.getElementById("myCanvas");
         var ctx = canvas.getContext('2d');
-
+        var randomCol = randomColor();
         var app = {};
         // the total area of our drawings, can be very large now
         app.WIDTH = 2320;
@@ -108,7 +116,7 @@
         app.draw = function() {
             // reset everything (clears the canvas + transform + fillStyle + any other property of the context)
             canvas.width = canvas.width;
-
+            obj_arr = [];
             // move our context by the inverse of our scrollbars' left and top property
             ctx.setTransform(1, 0, 0, 1, -app.scrollbars.left, -app.scrollbars.top);
 
@@ -130,29 +138,74 @@
             ctx.fillStyle = "rgba(200, 0, 0, 0.4)";
             ctx.fillText("Monday", 80, 20);
             ctx.fillText("Tuesday", 240, 20);
-            ctx.fillText("Wednesday", 390, 20);
-            ctx.fillText("Thursday", 560, 20);
+            ctx.fillText("Wednesday", 410, 20);
+            ctx.fillText("Thursday", 580, 20);
             ctx.fillText("Friday", 740, 20);
-            ctx.fillText("Saturday", 900, 20);
+            ctx.fillText("Saturday", 910, 20);
             ctx.fillText("Sunday", 1080, 20);
 
             ctx.fillText("Monday", 1240, 20);
-            ctx.fillText("Tuesday", 1390, 20);
+            ctx.fillText("Tuesday", 1410, 20);
             ctx.fillText("Wednesday", 1570, 20);
             ctx.fillText("Thursday", 1740, 20);
             ctx.fillText("Friday", 1900, 20);
-            ctx.fillText("Saturday", 2060, 20);
-            ctx.fillText("Sunday", 2220, 20);
+            ctx.fillText("Saturday", 2070, 20);
+            ctx.fillText("Sunday", 2230, 20);
+
+            var x_week = 8;
+            ctx.fillStyle = "rgba(200, 0, 200, 0.3)";
+            ctx.font = "bold italic 7px sans-serif";
+            ctx.fillText("10", x_week , 45);
+            ctx.fillText("11", x_week + 15, 45);
+            ctx.fillText("12", x_week + 30, 45);
+            ctx.fillText("13", x_week + 45, 45);
+            ctx.fillText("B ", x_week + 60, 45);
+            ctx.fillText("14", x_week + 75, 45);
+            ctx.fillText("15", x_week + 90, 45);
+            ctx.fillText("16", x_week + 105, 45);
+            ctx.fillText("17", x_week + 120, 45);
+            ctx.fillText("18", x_week + 135, 45);
+            ctx.fillText("19", x_week + 150, 45);
 
            ctx.beginPath();
-            for(var i = 1; i < 14; i++){
+
+            for(var j = 1; j < 9; j++) { // draw col hours first
+                ctx.beginPath();
                 ctx.strokeStyle = "#e3e3e3";
+                ctx.moveTo((18 * j), 50);
+                ctx.lineTo((18 * j), app.HEIGHT);
+                ctx.stroke();
+            }
+            for(var i = 1; i < 14; i++){ // draw col day
+                ctx.beginPath();
+                ctx.fillStyle = "rgba(200, 0, 200, 0.3)";
+                ctx.font = "bold italic 7px sans-serif";
+                ctx.fillText("10", x_week + (xBlock * i), 45);
+                ctx.fillText("11", x_week + (xBlock * i + 15), 45);
+                ctx.fillText("12", x_week + (xBlock * i + 30), 45);
+                ctx.fillText("13", x_week + (xBlock * i + 45), 45);
+                ctx.fillText("B ", x_week + (xBlock * i + 60), 45);
+                ctx.fillText("14", x_week + (xBlock * i + 75), 45);
+                ctx.fillText("15", x_week + (xBlock * i + 90), 45);
+                ctx.fillText("16", x_week + (xBlock * i + 105), 45);
+                ctx.fillText("17", x_week + (xBlock * i + 120), 45);
+                ctx.fillText("18", x_week + (xBlock * i + 135), 45);
+                ctx.fillText("19", x_week + (xBlock * i + 150), 45);
+                ctx.strokeStyle = "#808080";
                 ctx.moveTo(xBlock * i,0);
                 ctx.lineTo(xBlock * i,app.HEIGHT);
                 ctx.stroke();
+
+                for(var j = 1; j < 9; j++) { // draw col hours first
+                    ctx.beginPath();
+                    ctx.strokeStyle = "#e3e3e3";
+                    ctx.moveTo(xBlock * i + (18.6 * j), 50);
+                    ctx.lineTo(xBlock * i + (18.6 * j), app.HEIGHT);
+                    ctx.stroke();
+                }
             }
 
-            ctx.strokeStyle = "#e3e3e3";
+            ctx.strokeStyle = "#808080";
             ctx.moveTo(0,50);
             ctx.lineTo(app.WIDTH,50);
             ctx.stroke();
@@ -161,36 +214,42 @@
             for(var i = 1; i <= amountProjects; i++){
                ctx.beginPath();
                ctx.lineWidth = 1;
-               ctx.strokeStyle = "#e3e3e3";
+               ctx.strokeStyle = "#808080";
                ctx.moveTo(0,yBlock * i + underLine);
                ctx.font = "bold italic 10px sans-serif";
                ctx.fillText(arr_pr[i-1], 30, yBlock * i + underLine - 5);
                ctx.lineTo(app.WIDTH,yBlock * i + underLine);
                ctx.stroke();
                     var glass = arr_all_pr[i-1];
-                    //console.log(glass);
                     if(glass != undefined) {
                         for (var jx = 0; jx < glass.length; jx++) {
                             ctx.beginPath();
                             ctx.lineWidth = 10;
-                            ctx.lineCap = "round";
-                            ctx.strokeStyle = "red";
-                            var start = parseTime(new Date(glass[jx].created_at), maxWidth);
+                            ctx.strokeStyle = randomCol;
+
+                            var start = parseTime(new Date(glass[jx].created_at), xBlock, false);
                             //console.log(start);
-                            var finish = parseTime(new Date(glass[jx].finish_at), maxWidth);
+                            var finish = parseTime(new Date(glass[jx].finish_at), xBlock, false);
                             //console.log(finish);
                             //var step = (yBlock * i + 50 - yBlock * (i-1) + 45) /  glass.length;
                             var step = 10;
+                            var obj_for_add = {};
+                            obj_for_add.startX = start;
+                            obj_for_add.finishX = finish;
+                            obj_for_add.startY = (yBlock * (i - 1) + underLine) + step * (jx + 1);
+                            obj_for_add.finishY = (yBlock * (i - 1) + underLine) + step * (jx + 1);
+                            obj_for_add.task = glass[jx].subject;
                             ctx.moveTo(start, (yBlock * (i - 1) + underLine) + step * (jx + 1));
                             ctx.lineTo(finish, (yBlock * (i - 1) + underLine) + step * (jx + 1));
                             ctx.stroke();
+                            obj_arr.push(obj_for_add);
                         }
                         if (glass.length > 5)
                             underLine = underLine + 10 * glass.length - 5;
                     }
             }
 
-            var result_now_time = parseTime(new Date(),maxWidth);
+            var result_now_time = parseTime(new Date(),xBlock, true);
             //console.log("now" + result_now_time);
 
 
@@ -201,7 +260,7 @@
            ctx.lineCap = "round";
            ctx.fillStyle = "rgba(200, 0, 200, 0.2)";
            ctx.font = "bold italic 10px sans-serif";
-           ctx.fillText("now", result_now_time+15, maxHeight/2);
+           ctx.fillText("now", result_now_time+15, maxHeight/3);
            ctx.strokeStyle = "rgba(200, 0, 200, 0.3)";
            ctx.stroke();
 
@@ -412,20 +471,48 @@
             }
         };
 
-        function parseTime(date,maxWidth) {
+        function randomColor(){
+            return('#'+Math.floor(Math.random()*16777215).toString(16));
+        }
 
-            var sizeOneDayOfPx = maxWidth / (9 * 7);
+        function parseTime(date,maxWidth,now) {
+            var sizeOneDayOfPx = maxWidth / 9;
             var day_of_week = date.getDay();
             var add_day = date.getHours();
+            var dataNow = new Date().getWeekNumber();
+            var data_week_of_year = date.getWeekNumber();
+            if (day_of_week == 0)
+                day_of_week = 7;
 
-            if(day_of_week !== 0 && day_of_week !== 6){
-                var day = (((day_of_week - 1) * 9) + add_day) * sizeOneDayOfPx;
-                alert(date);
-                alert(day);
-                var time_Now = (date.getTime() + 259200000) % 604800000;
-                var answer_now_time = time_Now * 100 /604800000;
+            if(!now) {
+                if (dataNow + 1 == data_week_of_year) {
+                    var day = (((((day_of_week - 2) * 9) + add_day) * sizeOneDayOfPx)+ (sizeOneDayOfPx * 9 * 7) - 18.009);
+                    // alert(maxWidth);
+                    /*var time_Now = (date.getTime() + 259200000) % 604800000;
+                     var answer_now_time = time_Now * 100 / 604800000;*/
+                    //return  answer_now_time * maxWidth /100;
+                    return day;
+                } else {
+
+                    var day = (((((day_of_week - 2) * 9) + add_day) * sizeOneDayOfPx) - 18.009);
+                    //alert(day);
+                    /*var time_Now = (date.getTime() + 259200000) % 604800000;
+                     var answer_now_time = time_Now * 100 / 604800000;*/
+                    //return  answer_now_time * maxWidth /100;
+                    return day;
+                }
+            }else{
+                if(add_day > 19)
+                    add_day = 19;
+                if(add_day < 10)
+                    add_day = 10;
+
+                var day = (((((day_of_week - 2) * 9) + add_day) * sizeOneDayOfPx) - 18.009);
+                // alert(maxWidth);
+                /*var time_Now = (date.getTime() + 259200000) % 604800000;
+                 var answer_now_time = time_Now * 100 / 604800000;*/
                 //return  answer_now_time * maxWidth /100;
-                return  day;
+                return day;
             }
         }
 
@@ -434,6 +521,22 @@
             app.scrollbars.scrollBy(e.deltaX, e.deltaY);
         };
 
+        var mouse_monitor = function(e) {
+            app.draw();
+            var rect = canvas.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            if((obj_arr[0].startX <= x && obj_arr[0].finishX >= x) && (obj_arr[0].startY - 10 <= y && obj_arr[0].startY + 10 >= y )){
+                ctx.beginPath();
+                ctx.fillStyle = randomCol;
+                ctx.font = "bold italic 10px sans-serif";
+                ctx.fillText(obj_arr[0].task , x + 10, y + 30);
+                console.log("vision");
+            }
+
+        }
+
+        canvas.addEventListener('mousemove', mouse_monitor);
         canvas.addEventListener('mousemove', mousemove);
         canvas.addEventListener('mousedown', mousedown);
         canvas.addEventListener('mouseup', mouseup);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\LinkIdDistIdTech;
+use ArrayObject;
 use Illuminate\Http\Request;
 use App\LinkIdTaskIdDescription;
 use App\Description;
@@ -300,11 +301,18 @@ class HomeController extends Controller
             }*/
         }
 
+
+
+        usort($main_answer_for_paint_canvas, array($this,"alpha_sort"));
+
+
+
+        //dd($main_answer_for_paint_canvas);
+
         $data = [
             'distribution' => $result_last,
             'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas,
         ];
-        //dd($data);
 
         return view("home",$data);
     }
@@ -316,6 +324,14 @@ class HomeController extends Controller
             if(is_object($field))$field = $this->objectToarray($field);
         }
         return $array;
+    }
+
+    function alpha_sort($a, $b) {
+
+        if ($a->TagProject == $b->TagProject) {
+            return strnatcmp($a->TagProject, $b->TagProject);
+        }
+        return strnatcmp($a->TagProject, $b->TagProject);
     }
 
 
