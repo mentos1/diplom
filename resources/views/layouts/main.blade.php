@@ -21,6 +21,13 @@
         padding: 5px;
         margin: 5px;
     }
+    .layer {
+        overflow: scroll; /* Добавляем полосы прокрутки */
+        width: 300px; /* Ширина блока */
+        height: 150px; /* Высота блока */
+        padding: 2px; /* Поля вокруг текста */
+        overflow-x: hidden;
+    }
     .passive_Bg{
         background-color: #ad676a;
     }

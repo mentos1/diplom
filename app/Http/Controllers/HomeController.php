@@ -15,6 +15,7 @@ use App\PriorityTask;
 use App\Speciality;
 use App\StatusTask;
 use App\TagSpeciality;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -309,10 +310,12 @@ class HomeController extends Controller
 
         //dd($main_answer_for_paint_canvas);
 
+
         $data = [
-            'distribution' => $result_last,
+            'distribution' => array_reverse($result_last),
             'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas,
         ];
+
 
         return view("home",$data);
     }
@@ -444,6 +447,7 @@ class HomeController extends Controller
         }
         $task->description = $result_des;
         $task->technologies = $result_tech;
+
         $data = [
             'newTask' => $task,
             'priority' => PriorityTask::all(),

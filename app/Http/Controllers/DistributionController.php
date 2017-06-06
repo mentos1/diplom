@@ -40,8 +40,7 @@ class DistributionController extends Controller
             if($data_create_at->weekOfYear == $lastweek) {
                 $task = Distribution::getTaskById($d->idTask);
                 Distribution::updateDev($d->idProg,1);
-
-                $dev_AvailablePerWeek = Distribution::getAvailablePerWeek($d->idProg)->AvailablePerWeek;
+                $dev_AvailablePerWeek = Distribution::getAvailablePerWeek($d->idProg)[0]->AvailablePerWeek;
                 Distribution::setAvailablePerWeek($d->idProg,$task[0]->estimate + $dev_AvailablePerWeek );
             }
         }

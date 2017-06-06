@@ -104,6 +104,7 @@
 
         console.dir(arr_all_pr);
         var canvas = document.getElementById("myCanvas");
+        canvas.height = 200 * count_Pr;
         var ctx = canvas.getContext('2d');
         var randomCol = randomColor();
         var app = {};
@@ -571,23 +572,29 @@
                 @foreach($distribution as $dist)
                         <tr  id='{!! $dist->subject !!}'>
                         <td>{!! $dist->subject !!}</td>
-                        <td>@foreach($dist->description as $dTask)
-                                    {!! $dTask !!}
-                            @endforeach
-                        </td>
                         <td>
-                            {!! $dist->priority !!}
-                        </td>
-                        <td>
-                            {!! $dist->status !!}
-                        </td>
-                        <td>
-                            @foreach($dist->technologies as $dTask)
-                                <span>{!! $dTask !!}</span>
-                            @endforeach
-                        </td>
-                        <td>{!! $dist->estimate !!}</td>
-                            <td><span>0000</span></td>
+                            <div class="layer">
+                                @foreach($dist->description as $dTask)
+                                    <h4><b>Description {{$loop->iteration}}</b></h4>
+                                    <p>
+                                            {!! $dTask !!}
+                                    </p>
+                                @endforeach
+                            </div>
+                            </td>
+                            <td>
+                                {!! $dist->priority !!}
+                            </td>
+                            <td>
+                                {!! $dist->status !!}
+                            </td>
+                            <td>
+                                @foreach($dist->technologies as $dTask)
+                                    <span>{!! $dTask !!}</span>
+                                @endforeach
+                            </td>
+                            <td>{!! $dist->estimate !!}</td>
+                            <td><span>{{ $dist->created_at }}</span></td>
                             <td>
                                 @foreach($dist->developers as $dDevelopers)
                                     <span data-val="{{$dDevelopers->id}}">{!! $dDevelopers->FirstName !!} {!! $dDevelopers->LastName !!}</span>
@@ -595,9 +602,9 @@
                             </td>
                             <td><button type='button' class='btn btn-danger' data-blok="active" value="{{$dist->id}}">Delete</button>
                                 <form method="POST" action="http://localhost/diplom/public/update/{{$dist->id}}" accept-charset="UTF-8">
-                                    <input name="_token" value="jnubEBtxw7yYXeCgBjjt4ztrmUP0HvxB2t7G7mAP" type="hidden">
+                                    <input name="_token" value="jnubEBtxw7yYXeCgBjjt4ztrmUP0HvxB2t7G7mAP" style="margin: 5px" type="hidden">
                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                    <button type='submit' class='btn btn-info' data-blok="active" value="{{$dist->id}}">Update</button>
+                                    <button type='submit' class='btn btn-info' data-blok="active" style="margin: 5px" value="{{$dist->id}}">Update</button>
                                 </form>
                             </td>
                         </tr>
