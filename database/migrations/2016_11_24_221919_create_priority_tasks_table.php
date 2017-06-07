@@ -16,7 +16,6 @@ class CreatePriorityTasksTable extends Migration
         Schema::create('priority_tasks', function (Blueprint $table) {
             $table->increments('id');
             $table->string('priority');
-            $table->timestamps();
         });
     }
 

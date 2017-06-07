@@ -98,6 +98,12 @@ class Distribution extends Model
                 ->update(['CountWeek' => $week,'CountYears' => $year]);
     }
 
+    public static function AddWeek($week, $year){
+        return  DB::table('week')
+            ->where('id', 1)
+            ->insert(['CountWeek' => $week,'CountYears' => $year]);
+    }
+
     public static function ClearBusy(){
         return DB::table('developers')->update(['busy' => 0]);
     }
