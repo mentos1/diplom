@@ -2,12 +2,11 @@
 
 @section('content')
     <div class="container">
-        <h2>Bordered Table</h2>
-        <p>The .table-bordered class adds borders to a table:</p>
+        <h2>Update Developer</h2>
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>Prevent</th>
+                <th>Previus</th>
                 <th>New</th>
             </tr>
             </thead>

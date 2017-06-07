@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class Distribution extends Model
 {
@@ -20,11 +21,16 @@ class Distribution extends Model
             ->get();
     }
 
-    public static function updateTaskStatus($id,$status){
-        DB::table('dist_tasks')
-            ->where('id', $id)
-            ->update(['status' => $status]);
-        return true;
+    public static function updateTaskStatus($id,$status)
+    {
+        if (Schema::hasTable('dist_tasks')) {
+            DB::table('dist_tasks')
+                ->where('id', $id)
+                ->update(['status' => $status]);
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public static function updateDev($id,$busy){
@@ -35,9 +41,11 @@ class Distribution extends Model
     }
 
     public static function getCreate_at_by_TagProject($TagProject){
-        return DB::table('dist_tasks')
-            ->where('TagProject', $TagProject)
-            ->get();
+        if (Schema::hasTable('dist_tasks')) {
+            return DB::table('dist_tasks')
+                ->where('TagProject', $TagProject)
+                ->get();
+        }
     }
 
 
@@ -81,7 +89,8 @@ class Distribution extends Model
 
     ///////////////////////////////
     public static function getDev($id){
-        return DB::table('distributions')
+        if (Schema::hasTable('distributions'))
+            return DB::table('distributions')
             //->LeftJoin('developers', 'distributions.idProg', '=', 'developers.id')
             ->where('idTask', $id)
             ->get();
@@ -124,6 +133,7 @@ class Distribution extends Model
             ->get();
     }
     public static function getDevFromDistribution($id){
+        if (Schema::hasTable('distributions'))
         return DB::table('distributions')
             //->LeftJoin('developers', 'distributions.idProg', '=', 'developers.id')
             ->where('idProg', $id)
@@ -137,6 +147,7 @@ class Distribution extends Model
 
     ///////////////////////////////
     public static function getTaskById($id){
+        if (Schema::hasTable('dist_tasks'))
         return DB::table('dist_tasks')
             ->where('id', $id)
             ->get();

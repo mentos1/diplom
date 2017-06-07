@@ -80,9 +80,11 @@ class DistributionController extends Controller
 
         // distributions
         $distribution = DistTask::all();
-        foreach ($distribution as $item){
-            if(sizeof(Distribution::getDev($item->id)) > 0)
-                array_push($result, Distribution::getDev($item->id));
+        if(count($distribution) !== 0) {
+            foreach ($distribution as $item) {
+                if (sizeof(Distribution::getDev($item->id)) > 0)
+                    array_push($result, Distribution::getDev($item->id));
+            }
         }
 
 
@@ -92,6 +94,7 @@ class DistributionController extends Controller
         $Dis = Developer::all();
         $Distribution = Distribution::all();
 
+        if(count($Dis) !== 0)
         foreach($Dis as $d) {
             if($d->AvailablePerWeek < 40){
                 $dd = new class
@@ -109,11 +112,15 @@ class DistributionController extends Controller
                 }
                 $dd->DaysBeforeStart = 0;
                 $dd->HoursBeforeStart = 0;
-                foreach(DistTask::getTimeWhenTaskBeFree($d->id) as $dist){ //перебортасков  с массива распределения
+                $val_dist_task = DistTask::getTimeWhenTaskBeFree($d->id);
+                if(count($val_dist_task) !== 0)
+                    dd($val_dist_task);
+                foreach($val_dist_task as $dist){ //перебортасков  с массива распределения
                     $date_Create = Carbon::parse($dist->created_at);
                     $date_Create_T = Carbon::parse($dist->created_at);
                     $date_now = Carbon::now()->addHours(3);
                     $items = DistTask::getActiveProg($dist->idTask); // получения по Тасков по айди
+                    if(count($items) !== 0)
                     foreach ($items as $item) {
                             if ($item->status != 4 ){
                                 $date = $this->dateFinishWorks($date_Create, $item);
@@ -143,6 +150,7 @@ class DistributionController extends Controller
         /////////////////////////////////////////////////////////////
         $Dis = DistTask::all();
         $result_DistTask = array();
+        if(count($Dis) !== 0)
         foreach($Dis as $d){
             if ($d->status != 4 && count(Distribution::getDev($d->id)) == 0) {
                 $dd = new class
@@ -185,7 +193,7 @@ class DistributionController extends Controller
         'developer' => $data_dev,
         'distTaskController' => $distTaskController->index()->getData()
     ];
-        return view("distribution",$data);
+        return view("distribution", $data);
     }
 
     /**

@@ -2,12 +2,11 @@
 
 @section('content')
 <div class="container">
-    <h2>Bordered Table</h2>
-    <p>The .table-bordered class adds borders to a table:</p>
+    <h2>Update Task</h2>
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th>Prevent</th>
+            <th>Previus</th>
             <th>New</th>
         </tr>
         </thead>
@@ -17,7 +16,7 @@
             <td>
                 <div class="form-group col-sm-10">
                     <label for="subject">Subject</label>
-                    <input data-id="{{ $newTask->id }}" class="form-control" name="subject" id="subject" type="text">
+                    <input data-id="{{ $newTask->id }}" class="form-control" name="subject" value="{{ $newTask->subject }}" id="subject" type="text">
                 </div>
             </td>
         </tr>

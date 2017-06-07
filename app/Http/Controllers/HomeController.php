@@ -74,6 +74,8 @@ class HomeController extends Controller
             if(sizeof(Distribution::getDev($item->id)) > 0)
             array_push($result, Distribution::getDev($item->id));
         }
+
+        if(isset($result))
         foreach ($result as $it) {
             foreach ($it as $item) {
                 $task = Distribution::getTaskById($item->idTask)[0];
@@ -88,7 +90,6 @@ class HomeController extends Controller
                 }
             }
         }
-
 
 
         $arrCreatedTask = [];
@@ -202,6 +203,7 @@ class HomeController extends Controller
 
 
         $result_last = [];
+        if(isset($result))
         foreach ($result as $it) {
             $b = true;
             $prepere_task  = 0;
@@ -247,19 +249,24 @@ class HomeController extends Controller
             array_push($result_last, $return_Task);
         }
 
+
         $projects = DistTask::select(['TagProject'])->get();
         $arr_progs = [];
 
+        if(isset($projects))
         foreach ($projects as $it){
             array_push($arr_progs,$it);
         }
 
         $unique_arr_progs = array_unique($arr_progs);
         $main_answer_for_paint_canvas = [];
+        if(isset($unique_arr_progs))
         foreach ($unique_arr_progs as $it){
             $arr_project_name = Distribution::getCreate_at_by_TagProject($it->TagProject);
             $arr_stack_for_val = [];
             foreach ($arr_project_name as $it1){
+
+                if(count(Distribution::all()) != 0){
                     $dist = Distribution::getDevFromDistribution($it1->id);
                     foreach ($dist as $itemDev){
                         if(isset($itemDev)) {
@@ -294,6 +301,7 @@ class HomeController extends Controller
                             }
                         }
                     }
+                }
             }
             //$main_answer_for_paint_canvas_unique = array_unique($main_answer_for_paint_canvas);
             //dd($main_answer_for_paint_canvas);
@@ -301,8 +309,6 @@ class HomeController extends Controller
                 array_push($main_answer_for_paint_canvas, $arr_stack_for_val);
             }*/
         }
-
-
 
         usort($main_answer_for_paint_canvas, array($this,"alpha_sort"));
 
@@ -553,7 +559,9 @@ class HomeController extends Controller
         $Dis = Developer::all();
         $Distribution = Distribution::all();
         $result_Developer = array();
+        if(isset($Dis))
         foreach($Dis as $d){
+            if(isset($Distribution))
             foreach ($Distribution as $item){
                 if($item->idProg == $d->id){
                     $dd = new class

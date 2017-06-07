@@ -19,7 +19,7 @@
                     </div>
 
                     <div class="form-group col-sm-10">
-                        <label for="lastName">LastName</label>
+                        <label for="lastName">Email</label>
                         <input class="form-control" name="lastName" id="lastName" type="text">
                     </div>
 
@@ -40,8 +40,7 @@
                         </select>
                     </div>
                     <div class="form-group col-sm-10">
-                        <label for="AvailablePerWeek">AvailablePerWeek</label>
-                        <input id="AvailablePerWeek" name="AvailablePerWeek"  type="number" max="40" min="20" class="form-control" title="Enter the number of working hours"  placeholder="40">
+                        <input id="AvailablePerWeek" name="AvailablePerWeek"  type="hidden" value="0" class="form-control" title="Enter the number of working hours"  placeholder="40">
                     </div>
                     <div class="form-group col-sm-10">
                         @foreach($tag as $t)

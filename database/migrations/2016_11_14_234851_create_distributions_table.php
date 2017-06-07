@@ -16,7 +16,7 @@ class CreateDistributionsTable extends Migration
         Schema::create('distributions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('idTask');
-            $table->integer('idDescriptions');
+            $table->integer('idProg');
             $table->timestamps();
 
         });
