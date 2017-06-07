@@ -143,45 +143,52 @@
          });
 
 
-        var check_task = true
+        var check_task = true;
         $("#sendFormBut").click(function (e) {
-            //e.preventDefault();
-            var arr = $('#div2').children();
-            var devArr = [];
-            for (var i = 0; i < arr.length; i++) {
-                devArr.push(+($(arr[i]).find("input").val()));
-            }
-
-            var data = {
-                "_token": "{{ csrf_token() }}",
-                "idTask": $("select").find(":selected").val(),
-                "dev": devArr,
-                "dataTime": $("#datepicker").val(),
-                "hoursTime": $(".timepicker").val()
-            };
-            console.log(data);
-            $.ajax({
-                type: "POST",
-                url: "http://localhost/diplom/public/distribution/checkTask",
-                data: data,
-                dataType: 'json',                    // тип загружаемых данных
-                success: function (data) { // вешаем свой обработчик на функцию success
-                    console.log(data);
-                    if (data.$answer_AvailablePerWeek == false) {
-                        alert("У программиста не осталось свободных часов на этой неделе.");
-                    }
-                    if (data.$answer_created_at == false) {
-                        alert("На время этой задачи программист будет занят на друой задичи. Выберите другого програмиста.");
-                    }
-                    if (data.weeked == false) {
-                        alert("Вы питаетесь начать с выходного дня.");
-                    }
-                    if (data.$answer_AvailablePerWeek == true && data.$answer_created_at == true && data.weeked == true) {
-                        //b = false;
-                        //this.click;
-                    }
+            if(check_task)
+            e.preventDefault();
+            if($('#div2').children().length) {
+                var arr = $('#div2').children();
+                var devArr = [];
+                for (var i = 0; i < arr.length; i++) {
+                    devArr.push(+($(arr[i]).find("input").val()));
                 }
-            });
+
+                var data = {
+                    "_token": "{{ csrf_token() }}",
+                    "idTask": $("select").find(":selected").val(),
+                    "dev": devArr,
+                    "dataTime": $("#datepicker").val(),
+                    "hoursTime": $(".timepicker").val()
+                };
+                console.log(data);
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost/diplom/public/distribution/checkTask",
+                    data: data,
+                    dataType: 'json',                    // тип загружаемых данных
+                    success: function (data) { // вешаем свой обработчик на функцию success
+                        console.log(data);
+                        if (data.answer_AvailablePerWeek == false) {
+                            alert("У программиста не осталось свободных часов на этой неделе.");
+                            check_task = true;
+                        }
+                        if (data.answer_created_at == false) {
+                            alert("На время этой задачи программист будет занят на друой задичи. Выберите другого програмиста.");
+                            check_task = true;
+                        }
+                        if (data.weeked == false) {
+                            alert("Вы питаетесь начать с выходного дня.");
+                            check_task = true;
+                        }
+                        if (data.answer_AvailablePerWeek == true && data.answer_created_at == true && data.weeked == true) {
+                            console.log("Успех");
+                            check_task = false;
+                            $(this).submit(); // дабавить Сабмит
+                        }
+                    }
+                });
+            }
         });
 
 

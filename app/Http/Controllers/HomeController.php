@@ -314,9 +314,6 @@ class HomeController extends Controller
 
 
 
-        //dd($main_answer_for_paint_canvas);
-
-
         $data = [
             'distribution' => array_reverse($result_last),
             'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas,

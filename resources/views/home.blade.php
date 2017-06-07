@@ -225,7 +225,7 @@
                     if(glass != undefined) {
                         for (var jx = 0; jx < glass.length; jx++) {
                             ctx.beginPath();
-                            ctx.lineWidth = 10;
+                            ctx.lineWidth = 8;
                             ctx.strokeStyle = randomCol;
 
                             var start = parseTime(new Date(glass[jx].created_at), xBlock, false);
@@ -233,7 +233,7 @@
                             var finish = parseTime(new Date(glass[jx].finish_at), xBlock, false);
                             //console.log(finish);
                             //var step = (yBlock * i + 50 - yBlock * (i-1) + 45) /  glass.length;
-                            var step = 10;
+                            var step = 20;
                             var obj_for_add = {};
                             obj_for_add.startX = start;
                             obj_for_add.finishX = finish;
@@ -527,14 +527,14 @@
             var rect = canvas.getBoundingClientRect();
             var x = e.clientX - rect.left;
             var y = e.clientY - rect.top;
-            if((obj_arr[0].startX <= x && obj_arr[0].finishX >= x) && (obj_arr[0].startY - 10 <= y && obj_arr[0].startY + 10 >= y )){
+            for(var i = 0; i < obj_arr.length; i++)
+            if((obj_arr[i].startX <= x && obj_arr[i].finishX >= x) && (obj_arr[i].startY - 10 <= y && obj_arr[i].startY + 10 >= y )){
                 ctx.beginPath();
                 ctx.fillStyle = randomCol;
                 ctx.font = "bold italic 10px sans-serif";
-                ctx.fillText(obj_arr[0].task , x + 10, y + 30);
+                ctx.fillText(obj_arr[i].task , x + 10, y + 30);
                 console.log("vision");
             }
-
         }
 
         canvas.addEventListener('mousemove', mouse_monitor);
