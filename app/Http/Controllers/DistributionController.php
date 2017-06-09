@@ -12,30 +12,42 @@ use Illuminate\Support\Facades\DB;
 class DistributionController extends Controller
 {
     public function getDaysFormTime($date){
-        return floor($date/8);
+        return floor($date/9);
     }
     public function getHoursFormTime($date){
-        return $date % 8;
+        return $date % 9;
     }
     public function dateFinishWorks($date_Create,$item){
-        if($date_Create->hour >= 18 || $date_Create->hour < 10){
+        $start = Carbon::parse($date_Create);
+        if($date_Create->hour >= 19 || $date_Create->hour < 10){
             $date_Create->hour =  10;
         }
+
         $addDays = $this->getDaysFormTime($item->estimate);
         $addHours = $this->getHoursFormTime($item->estimate);
-        if($date_Create->hour + $addHours > 18){
+
+
+
+        if($date_Create->hour + $addHours >= 19){
             $date_Create->hour =  10;
-            $addHours = ($date_Create->hour + $addHours) - 18;
+            $addHours = ($date_Create->hour + $addHours) - 19;
             $addDays++;
         }
 
+
         $date_Create->addDays($addDays)->addHours($addHours);
-        $week_day_of_week = $date_Create->dayOfWeek;
-        $week_day_of_week = $date_Create->dayOfWeek;
-        while($week_day_of_week == 6 || $week_day_of_week == 7){
-            $week_day_of_week = $date_Create->dayOfWeek;
-            $date_Create->addDays(1);
+        //var_dump($start->dayOfWeek + 1  ===  $date_Create->dayOfWeek);
+        if($date_Create->dayOfWeek !== $start->dayOfWeek + 1){
+            var_dump($item->subject);
+            $date_Create->addDays(2);
+        }else {
+
+            while ($date_Create->dayOfWeek === Carbon::SUNDAY || $date_Create->dayOfWeek === Carbon::SATURDAY) {
+                $week_day_of_week = $date_Create->dayOfWeek;
+                $date_Create->addDays(1);
+            }
         }
+
 
         return $date_Create;
     }
@@ -130,20 +142,23 @@ class DistributionController extends Controller
                     foreach ($items as $item) {
                             if ($item->status != 4 ){
                                 $date = $this->dateFinishWorks($date_Create, $item);
+                                //dd($date);
                                 /*var_dump($date ." < ". $date_now);
                                 var_dump($date->timestamp < $date_now->timestamp);
 
                                 dd($date->dayOfWeek);*/
-                                if($date_Create_T->dayOfWeek < $date->dayOfWeek)
-                                    $date->addWeekdays(1);
 
-                                if($date->dayOfWeek == 6 || $date->dayOfWeek == 0)
-                                    $date->addDays(2);
+                                /*if($date_Create_T->dayOfWeek < $date->dayOfWeek)
+                                    //$date->addWeekdays(1);*/
 
-                                    if($date_Create_T->timestamp < $date_now->timestamp && $date->timestamp > $date_now->timestamp) {
-                                        $dd->DaysBeforeStart = $date->dayOfYear - $date_now->dayOfYear;
-                                        $dd->HoursBeforeStart = $date->hour - 10;
+                                if($date_Create_T->timestamp < $date_now->timestamp && $date->timestamp > $date_now->timestamp) {
+                                    $dd->DaysBeforeStart = $date_now->dayOfYear - $date->dayOfYear;
+                                    if($dd->DaysBeforeStart == 0){
+                                        $dd->HoursBeforeStart = $date->hour - $date_now->hour;
                                     }
+                                    $dd->HoursBeforeStart = $date->hour;
+
+                                }
                             }
                         }
                 }
@@ -192,8 +207,6 @@ class DistributionController extends Controller
 
         $distTaskController = new DistTaskController();
 
-
-
     $data = [
         'distTask' => $data_dist,
         'developer' => $data_dev,
@@ -228,7 +241,7 @@ class DistributionController extends Controller
             $answer_AvailablePerWeek = true;
             $answer_created_at = true;
             $answer_weeked = true;
-            for($i = 0; $i < count($arrDev); $i++){
+   /*         for($i = 0; $i < count($arrDev); $i++){
                 if(count(Distribution::getDevelopersById($arrDev[$i])) != 0) {
                     $dev = Distribution::getDevelopersById($arrDev[$i]);
                     $availablePerWeek = $dev[0]->AvailablePerWeek;
@@ -238,8 +251,9 @@ class DistributionController extends Controller
                         $answer_AvailablePerWeek = false;
                     }
                 }
-            }
-            for($i = 0; $i < count($arrDev); $i++){
+            }*/
+
+    /*        for($i = 0; $i < count($arrDev); $i++){
                 if(count(Distribution::getDevFromDistribution($arrDev[$i])) != 0) {
                     $dev = Distribution::getDevFromDistribution($arrDev[$i]);
                     for ($j = 0; $j < count($dev); $j++) {
@@ -247,14 +261,14 @@ class DistributionController extends Controller
                         $data_created_at_T = Carbon::parse($createdAt);
                         $data_created_at = Carbon::parse($createdAt);
                         $before_T = $this->dateFinishWorks($data_created_at, DistTask::find($dev[$j]->idTask));
-                        if ($date_Create_T > $before_T || $before < $data_created_at_T) {
+                        if ($date_Create_T->timestamp > $before_T->timestamp || $before->timestamp < $data_created_at_T->timestamp) {
                             $answer_created_at = true;
                         } else {
                             $answer_created_at = false;
                         }
                     }
                 }
-            }
+            }*/
             $week_day_of_week = $date_Create_T->dayOfWeek;
             if($week_day_of_week == 6 || $week_day_of_week == 0){
                 $answer_weeked = false;

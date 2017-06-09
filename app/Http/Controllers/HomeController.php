@@ -285,8 +285,19 @@ class HomeController extends Controller
                                 $obj =new class{};
                                 $obj->subject =  $task[0]->subject;
                                 $obj->TagProject =  $task[0]->TagProject;
+
                                 $obj->finish_at = $date->toDateTimeString();
                                 $obj->created_at = $date_Create_T->toDateTimeString();
+                                if($date->weekOfYear == $date_now->weekOfYear && $date_Create_T->weekOfYear + 1 == $date_now->weekOfYear){
+                                    $obj->finish_at = $date->toDateTimeString();
+                                    $obj->created_at = Carbon::createFromDate($date->year, $date->month, $date->day);
+                                    $obj->created_at->hour = 10;
+                                    $obj->created_at->minute = 0;
+                                    while($obj->created_at->dayOfWeek !== Carbon::MONDAY){
+                                        $obj->created_at->subDay(1);
+                                    }
+                                }
+
                                 if(count($main_answer_for_paint_canvas) == 0) {
                                     array_push($main_answer_for_paint_canvas, $obj);
                                 }else{

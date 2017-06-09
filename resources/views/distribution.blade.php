@@ -49,14 +49,14 @@
                     <input type="hidden" form="updateFormDev{{$mess->id}}" name="_token" value="{{ csrf_token() }}">
                     <div id="{!! $mess->FirstName !!}{!! $mess->LastName !!}" draggable="true" ondrop="drop(event)" ondragstart="drag(event)"  width="88" height="31">
                                 Name:  <span>{!! $mess->FirstName !!}</span></br>
-                                LastName:  <span>{!! $mess->LastName !!}</span></br>
+                                Email:  <span>{!! $mess->LastName !!}</span></br>
                                 Speciality:  <span>{!! $mess->idSpeciality !!}</span></br>
                                 Level:  <span>{!! $mess->idLevel !!}</span></br>
                                 AvailablePerWeek:  <span class="AvailablePerWeek">{!! $mess->AvailablePerWeek!!}</span></br>
                                 @foreach($mess->TagSpeciality as $tag)
                                     TagSpeciality:<span>{!!$tag!!}</span></br>
                                 @endforeach
-                                    @if($mess->HoursBeforeStart != 0 && $mess->DaysBeforeStart != 0)
+                                    @if($mess->HoursBeforeStart !== 0 || $mess->DaysBeforeStart !== 0)
                                         Will busy<span class="busyTime" style="color:red; font-size: 1.2em"><span class="days">{!! $mess->DaysBeforeStart !!}</span>d : <span class="hours">{!! $mess->HoursBeforeStart !!}</span>h</span>
                                     @else
                                         Will busy<span class="busyTime" style="color:green; font-size: 1.2em"> <span class="days">{!! $mess->DaysBeforeStart !!}</span>d : <span class="hours">{!! $mess->HoursBeforeStart !!}</span>h</span>
@@ -76,6 +76,7 @@
         </div>
         <div class="col-sm-4"></div>
         <div class="row" style="margin-left: 40px; margin-top: -550px; position: relative">
+            @if(count($distTask) != 0)
             <div class="form-group" style="position: absolute; right: 108px; top: 41px; z-index: 1;"><input type="text" form="sendForm" required  name="data_send" id="datepicker"></div>
             <div class="form-group" style="position: absolute; right: 308px; top: 41px; z-index: 1;"><input type="text" form="sendForm" required  name="data_time" class="timepicker"></div>
             <select id="task_id" name="task_id" form="sendForm" style="position: absolute; z-index: 2;">
@@ -125,6 +126,11 @@
                 <button type="submit" form="sendForm" id="sendFormBut" class="btn btn-success col-sm-5 col-sm-offset-2">Send</button>
             </div>
         </div>
+        @else
+            <div class="tab-content well well-lg" style ="margin-left:1000px; margin-right : 100px; text-align: center">
+                No free task
+            </div>
+        @endif
 
 <script>
     $(document).ready(function(){
@@ -188,40 +194,45 @@
                         }
                     }
                 });
+            }else{
+                alert("Вы не выбрали программистов.");
             }
         });
 
 
         $("#getAdvice").click(function (e) {
-
-            var data = {
-                "_token": "{{ csrf_token() }}",
-                "id": $("select").find(":selected").val()
-            }
-
-            //console.log(data);
-            $.ajax({
-                type: "POST",
-                url: "http://localhost/diplom/public/distribution/advice/" + data["id"],
-                data: data,
-                dataType: 'json',
-                //beforeSend: function(xhr){xhr.setRequestHeader('X-CSRF-TOKEN', $("#token").attr('content'));},
-                success: function (response) {
-                    var answer = response["response"];
-                    console.dir(answer);
-                    var itLength = 1 / answer.length, itOpacity = 0;
-
-                    for(var item in answer){
-                        itOpacity += itLength;
-                        console.log(itOpacity);
-                        $("input[value='" + answer[item].id + "']").parent().css("background-color" , "rgba(59, 252, 0, " + itOpacity);
-                    }
-
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.log(textStatus, errorThrown);
+            if($("select").find(":selected").val() !== undefined) {
+                var data = {
+                    "_token": "{{ csrf_token() }}",
+                    "id": $("select").find(":selected").val()
                 }
-            });
+
+                //console.log(data);
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost/diplom/public/distribution/advice/" + data["id"],
+                    data: data,
+                    dataType: 'json',
+                    //beforeSend: function(xhr){xhr.setRequestHeader('X-CSRF-TOKEN', $("#token").attr('content'));},
+                    success: function (response) {
+                        var answer = response["response"];
+                        console.dir(answer);
+                        var itLength = 1 / answer.length, itOpacity = 0;
+
+                        for (var item in answer) {
+                            itOpacity += itLength;
+                            console.log(itOpacity);
+                            $("input[value='" + answer[item].id + "']").parent().css("background-color", "rgba(59, 252, 0, " + itOpacity);
+                        }
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                    }
+                });
+            }else{
+                alert("У вас нет задач");
+            }
         });
     });
 
@@ -242,7 +253,7 @@
     function getDate() {
         var d = new Date();
         var n = d.getHours();
-        if (n > 18 || n < 10)
+        if (n > 19 || n < 10)
             return n = 10;
         return n;
     }
@@ -251,7 +262,7 @@
         timeFormat: 'H:mm',
         interval: 60,
         minTime: '10:00',
-        maxTime: '18:00',
+        maxTime: '19:00',
         defaultTime: ''+getDate(),
         startTime: '10:00',
         dynamic: false,

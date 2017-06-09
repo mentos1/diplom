@@ -135,7 +135,7 @@
                 "_token": "{{ csrf_token() }}",
                 "id": $("#FirstName").attr("data-id"),
                 "FirstName": $("#FirstName").val(),
-                "LastName": $("#LastName").val(),
+                "Email": $("#LastName").val(),
                 "speciality": $("#speciality").val(),
                 "lvl": $("#lvl").val(),
                 "tags_drop": drop_Thech,

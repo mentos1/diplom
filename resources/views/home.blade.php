@@ -109,7 +109,7 @@
         var randomCol = randomColor();
         var app = {};
         // the total area of our drawings, can be very large now
-        app.WIDTH = 2320;
+        app.WIDTH = 1160;
         //alert(amountProjects);
         app.HEIGHT = 200*amountProjects;
 
@@ -132,7 +132,7 @@
             // to draw only where required
             var maxHeight = canvas.getAttribute("height");
             var maxWidth = canvas.getAttribute("width");
-            var xBlock = app.WIDTH / 14;
+            var xBlock = app.WIDTH / 7;
             var yBlock = (app.HEIGHT / amountProjects / 1.5)-30;
             ctx.beginPath();
             ctx.font = '14px "Tahoma"';
@@ -153,20 +153,19 @@
             ctx.fillText("Saturday", 2070, 20);
             ctx.fillText("Sunday", 2230, 20);
 
-            var x_week = 8;
+            var x_week = 15;
             ctx.fillStyle = "rgba(200, 0, 200, 0.3)";
             ctx.font = "bold italic 7px sans-serif";
             ctx.fillText("10", x_week , 45);
-            ctx.fillText("11", x_week + 15, 45);
-            ctx.fillText("12", x_week + 30, 45);
-            ctx.fillText("13", x_week + 45, 45);
-            ctx.fillText("B ", x_week + 60, 45);
-            ctx.fillText("14", x_week + 75, 45);
-            ctx.fillText("15", x_week + 90, 45);
-            ctx.fillText("16", x_week + 105, 45);
-            ctx.fillText("17", x_week + 120, 45);
-            ctx.fillText("18", x_week + 135, 45);
-            ctx.fillText("19", x_week + 150, 45);
+            ctx.fillText("11", x_week + 16, 45);
+            ctx.fillText("12", x_week + 32, 45);
+            ctx.fillText("13", x_week + 47, 45);
+            ctx.fillText("14", x_week + 64, 45);
+            ctx.fillText("15", x_week + 80, 45);
+            ctx.fillText("16", x_week + 95, 45);
+            ctx.fillText("17", x_week + 111, 45);
+            ctx.fillText("18", x_week + 127, 45);
+            ctx.fillText("19", x_week + 142, 45);
 
            ctx.beginPath();
 
@@ -177,21 +176,22 @@
                 ctx.lineTo((18 * j), app.HEIGHT);
                 ctx.stroke();
             }
-            for(var i = 1; i < 14; i++){ // draw col day
+            for(var i = 1; i < 7; i++){ // draw col day
                 ctx.beginPath();
                 ctx.fillStyle = "rgba(200, 0, 200, 0.3)";
                 ctx.font = "bold italic 7px sans-serif";
-                ctx.fillText("10", x_week + (xBlock * i), 45);
-                ctx.fillText("11", x_week + (xBlock * i + 15), 45);
-                ctx.fillText("12", x_week + (xBlock * i + 30), 45);
-                ctx.fillText("13", x_week + (xBlock * i + 45), 45);
-                ctx.fillText("B ", x_week + (xBlock * i + 60), 45);
-                ctx.fillText("14", x_week + (xBlock * i + 75), 45);
-                ctx.fillText("15", x_week + (xBlock * i + 90), 45);
-                ctx.fillText("16", x_week + (xBlock * i + 105), 45);
-                ctx.fillText("17", x_week + (xBlock * i + 120), 45);
-                ctx.fillText("18", x_week + (xBlock * i + 135), 45);
-                ctx.fillText("19", x_week + (xBlock * i + 150), 45);
+                if(i != 5 && i != 6) {
+                    ctx.fillText("10", x_week + (xBlock * i), 45);
+                    ctx.fillText("11", x_week + (xBlock * i + 16), 45);
+                    ctx.fillText("12", x_week + (xBlock * i + 32), 45);
+                    ctx.fillText("13", x_week + (xBlock * i + 47), 45);
+                    ctx.fillText("14", x_week + (xBlock * i + 64), 45);
+                    ctx.fillText("15", x_week + (xBlock * i + 80), 45);
+                    ctx.fillText("16", x_week + (xBlock * i + 95), 45);
+                    ctx.fillText("17", x_week + (xBlock * i + 111), 45);
+                    ctx.fillText("18", x_week + (xBlock * i + 127), 45);
+                    ctx.fillText("19", x_week + (xBlock * i + 142), 45);
+                }
                 ctx.strokeStyle = "#808080";
                 ctx.moveTo(xBlock * i,0);
                 ctx.lineTo(xBlock * i,app.HEIGHT);
@@ -253,8 +253,20 @@
             var result_now_time = parseTime(new Date(),xBlock, true);
             //console.log("now" + result_now_time);
 
+            ctx.beginPath();
+            ctx.fillStyle = "#F5F5F5";
+            ctx.fillRect(829, 50, 1000, app.HEIGHT);
+            ctx.stroke();
 
-           ctx.beginPath();
+
+            ctx.beginPath();
+            ctx.fillStyle = "rgba(160, 160, 160, 0.3)";
+            ctx.font = "bold italic 20px sans-serif";
+            ctx.fillText("weekend",1000, app.HEIGHT/2);
+            ctx.stroke();
+
+
+            ctx.beginPath();
            ctx.moveTo(result_now_time, 0);
            ctx.lineTo(result_now_time, app.HEIGHT);
            ctx.lineWidth = 5;
@@ -528,7 +540,7 @@
             var x = e.clientX - rect.left;
             var y = e.clientY - rect.top;
             for(var i = 0; i < obj_arr.length; i++)
-            if((obj_arr[i].startX <= x && obj_arr[i].finishX >= x) && (obj_arr[i].startY - 10 <= y && obj_arr[i].startY + 10 >= y )){
+            if((obj_arr[i].startX <= x && obj_arr[i].finishX >= x) && (obj_arr[i].startY - 10 <= y && obj_arr[i].startY + 10 >= y ) && (829 >= x)){
                 ctx.beginPath();
                 ctx.fillStyle = randomCol;
                 ctx.font = "bold italic 10px sans-serif";
