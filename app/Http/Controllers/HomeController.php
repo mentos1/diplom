@@ -295,10 +295,10 @@ class HomeController extends Controller
                                 $obj->subject =  $task[0]->subject;
                                 $obj->TagProject =  $task[0]->TagProject;
 
-                                $obj->finish_at = $date->toDateTimeString();
-                                $obj->created_at = $date_Create_T->toDateTimeString();
+                                $obj->finish_at = $date;
+                                $obj->created_at = $date_Create_T;
                                 if($date->weekOfYear == $date_now->weekOfYear && $date_Create_T->weekOfYear + 1 == $date_now->weekOfYear){
-                                    $obj->finish_at = $date->toDateTimeString();
+                                    $obj->finish_at = $date;
                                     $obj->created_at = Carbon::createFromDate($date->year, $date->month, $date->day);
                                     $obj->created_at->hour = 10;
                                     $obj->created_at->minute = 0;
@@ -308,27 +308,34 @@ class HomeController extends Controller
                                 }
 
                                 if($date->weekOfYear == $date_now->weekOfYear + 1 && $date_Create_T->weekOfYear == $date_now->weekOfYear){
-                                    $obj->finish_at = $date->toDateTimeString();
-                                    $obj->created_at = Carbon::createFromDate($date->year, $date->month, $date->day);
-                                    $obj->created_at->hour = 19;
-                                    $obj->created_at->minute = 0;
-                                    while($obj->created_at->dayOfWeek !== Carbon::FRIDAY){
-                                        $obj->created_at->subDay(1);
+                                    $obj->finish_at = $date;
+                                    $obj->finish_at = Carbon::createFromDate($date->year, $date->month, $date->day);
+                                    $obj->finish_at->hour = 19;
+                                    $obj->finish_at->minute = 0;
+                                    while($obj->finish_at->dayOfWeek !== Carbon::FRIDAY){
+                                        $obj->finish_at->addDay(1);
                                     }
                                 }
 
                                 $DaysBeforeStart =  $date->dayOfYear - $obj->created_at->dayOfYear;
-
                                 if($obj->created_at->hour < $date->hour ){
                                     $HoursBeforeStart = $date->hour - $obj->created_at->hour;
                                 }else{
                                     $HoursBeforeStart = abs($obj->created_at->hour - $date->hour);
+                                }
+
+
+                                if($date->weekOfYear - 1 ==  $obj->created_at->weekOfYear){
+                                    $DaysBeforeStart = $DaysBeforeStart - 2;
                                 }
                                 $count_AvailablePerWeek = $DaysBeforeStart * 9 + $HoursBeforeStart;
                                 $msg = Developer::where("id", $itemDev->idProg)->get();
                                 $msg[0]->AvailablePerWeek = $count_AvailablePerWeek;
                                 $msg[0]->save();
 
+
+                                $obj->finish_at = $obj->finish_at->toDateTimeString();
+                                $obj->created_at = $obj->created_at->toDateTimeString();
 
                                 if(count($main_answer_for_paint_canvas) == 0) {
                                     array_push($main_answer_for_paint_canvas, $obj);
@@ -402,7 +409,8 @@ class HomeController extends Controller
 
         }
 
-        $data = ['distribution' => paginate(array_reverse($result_last) , 4), 'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas];
+        $data = ['distribution' => paginate(array_reverse($result_last) , 3), 'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas];
+
         return view("home", $data);
     }
 
