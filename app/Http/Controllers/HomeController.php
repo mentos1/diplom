@@ -266,7 +266,6 @@ class HomeController extends Controller
             $arr_project_name = Distribution::getCreate_at_by_TagProject($it->TagProject);
             $arr_stack_for_val = [];
             foreach ($arr_project_name as $it1){
-
                 if(count(Distribution::all()) != 0){
                     $dist = Distribution::getDevFromDistribution($it1->id);
                     foreach ($dist as $itemDev){
@@ -275,10 +274,17 @@ class HomeController extends Controller
                             $date_Create = Carbon::parse($itemDev->created_at);
                             $date_Create_T = Carbon::parse($itemDev->created_at);
                             $date_now = Carbon::now()->addHours(3);
+                            if($date_now->dayOfWeek === Carbon::SATURDAY || $date_now->dayOfWeek === Carbon::SUNDAY){
+                                $date_now->addWeek(1);
+                                while($date_now->dayOfWeek !== Carbon::MONDAY){
+                                         $date_now->subDay(1);
+                                }
+                                $date_now->hour  = 10;
+                                $date_now->minute = 0;
+                            }
                             $date = (new DistributionController)->dateFinishWorks($date_Create, $task[0]);
                             //var_dump($date_now->weekOfYear ."==".$date_Create_T->weekOfYear. "==" . $date->weekOfYear);
-                            if (($date_now->weekOfYear == $date_Create_T->weekOfYear || $date->weekOfYear == $date_now->weekOfYear) ||
-                                ($date_now->addWeek()->weekOfYear == $date_Create_T->weekOfYear || $date->addWeek()->weekOfYear == $date_now->weekOfYear)) {
+                            if (($date_now->weekOfYear == $date_Create_T->weekOfYear || $date->weekOfYear == $date_now->weekOfYear)) {
                                 //dd($date_now->weekOfYear ."==".$date_Create_T->weekOfYear. "==" . $date->weekOfYear);
                                 $task[0]->finish_at = $date->toDateTimeString();
                                 $check_add_Task = true;
@@ -327,22 +333,50 @@ class HomeController extends Controller
 
 
         //Get current page form url e.g. &page=6
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+/*        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+
 
         //Create a new Laravel collection from the array data
         $collection = new Collection(array_reverse($result_last));
 
         //Define how many items we want to be visible in each page
-        $perPage = 1;
+        $perPage = count($collection)/2;
 
         //Slice the collection to get the items to display in current page
         $currentPageSearchResults = $collection->slice($currentPage * $perPage, $perPage)->all();
 
         //Create our paginator and pass it to the view
-        $paginatedSearchResults= new LengthAwarePaginator($currentPageSearchResults, count($collection), $perPage);
+        $paginatedSearchResults= new LengthAwarePaginator($currentPageSearchResults, count($collection), $perPage);*/
+
+        if(!function_exists("paginate")){
 
 
-        return view("home",['distribution' => $paginatedSearchResults, 'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas]);
+            function paginate($data = array(), $perPage = 50){
+
+//Get current page form url e.g. &page=6
+
+                $currentPage = LengthAwarePaginator::resolveCurrentPage();
+
+//Create a new Laravel collection from the array data
+
+                $collection = new Collection($data);
+
+//Slice the collection to get the items to display in current page
+
+                $currentPageSearchResults = $collection->slice(($currentPage-1) * $perPage, $perPage)->all();
+
+//Create our paginator and pass it to the view
+
+                $paginatedSearchResults= new LengthAwarePaginator($currentPageSearchResults, count($collection), $perPage);
+
+                return $paginatedSearchResults;
+
+            }
+
+        }
+
+        $data = ['distribution' => paginate(array_reverse($result_last) , 4), 'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas];
+        return view("home", $data);
     }
 
     function objectToarray($data)

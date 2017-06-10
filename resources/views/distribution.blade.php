@@ -189,8 +189,8 @@
                         }
                         if (data.answer_AvailablePerWeek == true && data.answer_created_at == true && data.weeked == true) {
                             console.log("Успех");
-                            check_task = false;
-                            $(this).submit(); // дабавить Сабмит
+                            //check_task = false;
+                            //document.forms['sendForm'].submit(); // дабавить Сабмит
                         }
                     }
                 });
@@ -252,7 +252,7 @@
 
     function getDate() {
         var d = new Date();
-        var n = d.getHours();
+        var n = d.getHours() + 1;
         if (n > 19 || n < 10)
             return n = 10;
         return n;

@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container">
-    <canvas id="myCanvas" width="1140" height="300"  style="border:1px solid #e3e3e3; background-color: #f5f5f5; border-radius: 20px">
+    <canvas id="myCanvas" width="1140" height="300"  style="border:1px solid #e3e3e3; background-color: #f5f5f5; border-radius: 20px ">
         Your browser does not support the HTML5 canvas tag.
     </canvas>
     <script>
@@ -19,7 +19,8 @@
             var dat = new Date(this.valueOf());
             dat.setDate(dat.getDate() + days);
             return dat;
-        }
+        };
+        var now_Date = new Date();
 
         function getWeekNumber(d) {
             // Copy date so don't modify original
@@ -145,14 +146,6 @@
             ctx.fillText("Saturday", 910, 20);
             ctx.fillText("Sunday", 1080, 20);
 
-            ctx.fillText("Monday", 1240, 20);
-            ctx.fillText("Tuesday", 1410, 20);
-            ctx.fillText("Wednesday", 1570, 20);
-            ctx.fillText("Thursday", 1740, 20);
-            ctx.fillText("Friday", 1900, 20);
-            ctx.fillText("Saturday", 2070, 20);
-            ctx.fillText("Sunday", 2230, 20);
-
             var x_week = 15;
             ctx.fillStyle = "rgba(200, 0, 200, 0.3)";
             ctx.font = "bold italic 7px sans-serif";
@@ -250,7 +243,7 @@
                     }
             }
 
-            var result_now_time = parseTime(new Date(),xBlock, true);
+            var result_now_time = parseTime(now_Date,xBlock, true);
             //console.log("now" + result_now_time);
 
             ctx.beginPath();
@@ -496,7 +489,7 @@
             var sizeOneDayOfPx = maxWidth / 9;
             var day_of_week = date.getDay();
             var add_day = date.getHours();
-            var dataNow = new Date().getWeekNumber();
+            var dataNow = date.getWeekNumber();
             var data_week_of_year = date.getWeekNumber();
 
             if (day_of_week == 0)
@@ -505,18 +498,10 @@
             if(!now) {
                 if (dataNow + 1 == data_week_of_year) {
                     var day = (((((day_of_week - 2) * 9) + add_day) * sizeOneDayOfPx)+ (sizeOneDayOfPx * 9 * 7) - 18.009);
-                    // alert(maxWidth);
-                    /*var time_Now = (date.getTime() + 259200000) % 604800000;
-                     var answer_now_time = time_Now * 100 / 604800000;*/
-                    //return  answer_now_time * maxWidth /100;
                     return day;
                 } else {
 
                     var day = (((((day_of_week - 2) * 9) + add_day) * sizeOneDayOfPx) - 18.009);
-                    //alert(day);
-                    /*var time_Now = (date.getTime() + 259200000) % 604800000;
-                     var answer_now_time = time_Now * 100 / 604800000;*/
-                    //return  answer_now_time * maxWidth /100;
                     return day;
                 }
             }else{
@@ -526,10 +511,10 @@
                     add_day = 10;
 
                 var day = (((((day_of_week - 2) * 9) + add_day) * sizeOneDayOfPx) - 18.009);
-                // alert(maxWidth);
-                /*var time_Now = (date.getTime() + 259200000) % 604800000;
-                 var answer_now_time = time_Now * 100 / 604800000;*/
-                //return  answer_now_time * maxWidth /100;
+               if(day_of_week == 6 || day_of_week == 7){
+                   day = 1;
+               }
+
                 return day;
             }
         }
@@ -630,11 +615,11 @@
             @endif
             </tbody>
         </table>
-            {{ $distribution->links() }}
         </div>
 </div>
-
-
+    <div style="margin-left: 45%">
+        {{$distribution->setPath('diplom/public/')->render()}}
+    </div>
 <script>
 
     $(document).ready(function(){
