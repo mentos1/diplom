@@ -19,6 +19,7 @@
 Route::get('/developer',['uses' => "DevelopersController@index", "as" => "AddDevCont"]);
 Route::post('/developer/post',['uses' => "DevelopersController@index", "as" => "PostDevCont"]);
 Route::post('/developer/update/{id}',['uses' => "DevelopersController@update", "as" => "PostDevUpdate"]);
+Route::post('/developer/drop/developer',['uses' => "DevelopersController@drop", "as" => "PostDevDrop"]);
 Route::post('/developer/replaceDev',['uses' => "DevelopersController@replace", "as" => "replaceDev"]);
 
 

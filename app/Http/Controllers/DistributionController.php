@@ -37,8 +37,7 @@ class DistributionController extends Controller
 
         $date_Create->addDays($addDays)->addHours($addHours);
         //var_dump($start->dayOfWeek + 1  ===  $date_Create->dayOfWeek);
-        if($date_Create->dayOfWeek !== $start->dayOfWeek + 1){
-            var_dump($item->subject);
+        if($date_Create->dayOfWeek == $start->dayOfWeek + 1){
             $date_Create->addDays(2);
         }else {
 

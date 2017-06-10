@@ -104,7 +104,7 @@
 
         console.dir(arr_all_pr);
         var canvas = document.getElementById("myCanvas");
-        canvas.height = 200 * count_Pr;
+        canvas.height = 200 * arr_all_pr.length;
         var ctx = canvas.getContext('2d');
         var randomCol = randomColor();
         var app = {};
@@ -133,7 +133,7 @@
             var maxHeight = canvas.getAttribute("height");
             var maxWidth = canvas.getAttribute("width");
             var xBlock = app.WIDTH / 7;
-            var yBlock = (app.HEIGHT / amountProjects / 1.5)-30;
+            var yBlock = (app.HEIGHT / amountProjects / 1.15)-30;
             ctx.beginPath();
             ctx.font = '14px "Tahoma"';
             ctx.fillStyle = "rgba(200, 0, 0, 0.4)";
@@ -281,6 +281,8 @@
             // draw our scrollbars on top if needed
             app.scrollbars.draw();
         }
+        var globalX = 0;
+        var globalY = 0;
 
         app.scrollbars = function() {
             var scrollbars = {};
@@ -462,6 +464,8 @@
             // we're dragging something
             if (app.scrollbars.dragged) {
                 // update the mouse position
+                globalX = x;
+                globalY = y;
                 app.scrollbars.mousePos = app.scrollbars.dragged.vertical ? y : x;
                 app.scrollbars.scroll();
             } else if (app.scrollbars.isHover(x, y)) {
@@ -494,6 +498,7 @@
             var add_day = date.getHours();
             var dataNow = new Date().getWeekNumber();
             var data_week_of_year = date.getWeekNumber();
+
             if (day_of_week == 0)
                 day_of_week = 7;
 
@@ -539,13 +544,14 @@
             var rect = canvas.getBoundingClientRect();
             var x = e.clientX - rect.left;
             var y = e.clientY - rect.top;
-            for(var i = 0; i < obj_arr.length; i++)
-            if((obj_arr[i].startX <= x && obj_arr[i].finishX >= x) && (obj_arr[i].startY - 10 <= y && obj_arr[i].startY + 10 >= y ) && (829 >= x)){
-                ctx.beginPath();
-                ctx.fillStyle = randomCol;
-                ctx.font = "bold italic 10px sans-serif";
-                ctx.fillText(obj_arr[i].task , x + 10, y + 30);
-                console.log("vision");
+            for(var i = 0; i < obj_arr.length; i++) {
+                if ((obj_arr[i].startX <= x && obj_arr[i].finishX >= x ) && (obj_arr[i].startY - 10 <= y && obj_arr[i].startY + 10  >= y) && (829 >= x)) {
+                    ctx.beginPath();
+                    ctx.fillStyle = randomCol;
+                    ctx.font = "bold italic 10px sans-serif";
+                    ctx.fillText(obj_arr[i].task, x + 10, y + 30);
+                    console.log("vision");
+                }
             }
         }
 
@@ -563,7 +569,7 @@
 
 
     </script>
-    <div class="tab-content well well-lg">
+<div class="tab-content well well-lg">
         <div id="active" class="tab-pane fade in active">
             <table class="table table-condensed">
             <thead>
@@ -624,7 +630,11 @@
             @endif
             </tbody>
         </table>
+            {{ $distribution->links() }}
+        </div>
 </div>
+
+
 <script>
 
     $(document).ready(function(){

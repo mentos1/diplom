@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\LinkIdDistIdTech;
-use ArrayObject;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use App\LinkIdTaskIdDescription;
 use App\Description;
@@ -325,13 +326,23 @@ class HomeController extends Controller
 
 
 
-        $data = [
-            'distribution' => array_reverse($result_last),
-            'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas,
-        ];
+        //Get current page form url e.g. &page=6
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+
+        //Create a new Laravel collection from the array data
+        $collection = new Collection(array_reverse($result_last));
+
+        //Define how many items we want to be visible in each page
+        $perPage = 1;
+
+        //Slice the collection to get the items to display in current page
+        $currentPageSearchResults = $collection->slice($currentPage * $perPage, $perPage)->all();
+
+        //Create our paginator and pass it to the view
+        $paginatedSearchResults= new LengthAwarePaginator($currentPageSearchResults, count($collection), $perPage);
 
 
-        return view("home",$data);
+        return view("home",['distribution' => $paginatedSearchResults, 'mainAnswerPaintCanvas' => $main_answer_for_paint_canvas]);
     }
 
     function objectToarray($data)

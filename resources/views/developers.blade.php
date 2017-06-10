@@ -60,7 +60,7 @@
         </div>
         <div id="drop" class="tab-pane fade">
             <h2>Drop programmer</h2>
-            <form method="POST" class="form-horizontal" enctype="multipart/form-data" action="http://localhost/diplom/public/developer/drop" accept-charset="UTF-8">
+            <form method="POST" class="form-horizontal" enctype="multipart/form-data" action="http://localhost/diplom/public/developer/drop/developer" accept-charset="UTF-8">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label for="directions" class="control-label col-sm-2">Directions:</label>
@@ -71,6 +71,8 @@
                                 }
                             @endforeach
                         </select>
+                        <span class="label label-info" style="float: left" onclick="alert('1) Программист будет удален.\n2) Задача отправится в на стадию распределения.')">Info</span>
+
                     </div>
                 </div>
                 <div class="form-group">

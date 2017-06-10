@@ -73,13 +73,14 @@
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label for="directions" class="control-label col-sm-2">Directions:</label>
-                    <div class="col-sm-8">
+                    <div class="col-sm-8" >
                         <select name="DropTaskId" class="form-control" id="directions">
                             @foreach($distTask as $dist){
                                 <option value="{{ $dist->id }}">{{ $dist->subject }}</option>
                             }
                             @endforeach
                         </select>
+                        <span class="label label-info" style="float: left" onclick="alert('1) Задача будет удалена.\n2) Программисты выполняющие эту задачу, освободятся.\n3)Рабочие часы будут онулированы.')">Info</span>
                     </div>
                 </div>
                 <div class="form-group">
