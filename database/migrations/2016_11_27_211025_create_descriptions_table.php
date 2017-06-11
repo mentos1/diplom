@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateProgrammersTable extends Migration
+class CreateDescriptionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,9 @@ class CreateProgrammersTable extends Migration
      */
     public function up()
     {
-        Schema::create('programmers', function (Blueprint $table) {
+        Schema::create('descriptions', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('level');
-            $table->string('Directions');
-            $table->binary('img');
+            $table->binary('description');
             $table->timestamps();
         });
     }
@@ -30,6 +27,6 @@ class CreateProgrammersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('programmers');
+        Schema::dropIfExists('descriptions');
     }
 }

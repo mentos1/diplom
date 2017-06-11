@@ -16,7 +16,6 @@ class CreateTagSpecialitiesTable extends Migration
         Schema::create('tag_specialities', function (Blueprint $table) {
             $table->increments('id');
             $table->string('tag');
-            $table->timestamps();
         });
     }
 

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePriorityTasksTable extends Migration
+class CreateLinkIdDistIdTechesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreatePriorityTasksTable extends Migration
      */
     public function up()
     {
-        Schema::create('priority_tasks', function (Blueprint $table) {
+        Schema::create('link_id_dist_id_teches', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('priority');
+            $table->integer('idDist');
+            $table->integer('idTag');
+            $table->timestamps();
         });
     }
 
@@ -26,6 +28,6 @@ class CreatePriorityTasksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('priority_tasks');
+        Schema::dropIfExists('link_id_dist_id_teches');
     }
 }

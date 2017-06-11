@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePriorityTasksTable extends Migration
+class CreateWeekTask extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreatePriorityTasksTable extends Migration
      */
     public function up()
     {
-        Schema::create('priority_tasks', function (Blueprint $table) {
+        Schema::create('week', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('priority');
+            $table->integer('CountWeek');
+            $table->integer('CountYears');
         });
     }
 
@@ -26,6 +27,6 @@ class CreatePriorityTasksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('priority_tasks');
+        Schema::dropIfExists('week');
     }
 }

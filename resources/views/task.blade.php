@@ -38,7 +38,7 @@
     <div class="tab-content well well-lg">
         <div id="add" class="tab-pane fade in active">
             <div class="container">
-                <h2>Add programmer</h2>
+                <h2>Add Task</h2>
                 {!! Form::open(['route' => 'post.store'] ) !!}
                 <div class="form-group col-sm-10">
                     {!! Form::label('Task') !!}
@@ -75,7 +75,6 @@
                             <option>Full Stack</option>
                         </select>
                     </div>
-
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
