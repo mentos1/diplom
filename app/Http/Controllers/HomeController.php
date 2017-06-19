@@ -230,6 +230,7 @@ class HomeController extends Controller
                             $return_Task->developers = $result_dev;
                             array_push($result_last, $return_Task);
                             $result_dev = [];
+
                             $task = Distribution::getTaskById($item->idTask)[0];
                             $dd = new class
                             {
@@ -250,7 +251,6 @@ class HomeController extends Controller
             array_push($result_last, $return_Task);
         }
 
-
         $projects = DistTask::select(['TagProject'])->get();
         $arr_progs = [];
 
@@ -267,6 +267,7 @@ class HomeController extends Controller
             $arr_stack_for_val = [];
             foreach ($arr_project_name as $it1){
                 if(count(Distribution::all()) != 0){
+                    $count_AvailablePerWeek = 0;
                     $dist = Distribution::getDevFromDistribution($it1->id);
                     foreach ($dist as $itemDev){
                         if(isset($itemDev)) {
@@ -274,6 +275,7 @@ class HomeController extends Controller
                             $date_Create = Carbon::parse($itemDev->created_at);
                             $date_Create_T = Carbon::parse($itemDev->created_at);
                             $date_now = Carbon::now()->addHours(3);
+
                             if($date_now->dayOfWeek === Carbon::SATURDAY || $date_now->dayOfWeek === Carbon::SUNDAY){
                                 $date_now->addWeek(1);
                                 while($date_now->dayOfWeek !== Carbon::MONDAY){
@@ -305,6 +307,29 @@ class HomeController extends Controller
                                     }
                                 }
 
+                                if($date->weekOfYear == $date_now->weekOfYear + 1 && $date_Create_T->weekOfYear == $date_now->weekOfYear){
+                                    $obj->finish_at = $date->toDateTimeString();
+                                    $obj->created_at = Carbon::createFromDate($date->year, $date->month, $date->day);
+                                    $obj->created_at->hour = 19;
+                                    $obj->created_at->minute = 0;
+                                    while($obj->created_at->dayOfWeek !== Carbon::FRIDAY){
+                                        $obj->created_at->subDay(1);
+                                    }
+                                }
+
+                                $DaysBeforeStart =  $date->dayOfYear - $obj->created_at->dayOfYear;
+
+                                if($obj->created_at->hour < $date->hour ){
+                                    $HoursBeforeStart = $date->hour - $obj->created_at->hour;
+                                }else{
+                                    $HoursBeforeStart = abs($obj->created_at->hour - $date->hour);
+                                }
+                                $count_AvailablePerWeek = $DaysBeforeStart * 9 + $HoursBeforeStart;
+                                $msg = Developer::where("id", $itemDev->idProg)->get();
+                                $msg[0]->AvailablePerWeek = $count_AvailablePerWeek;
+                                $msg[0]->save();
+
+
                                 if(count($main_answer_for_paint_canvas) == 0) {
                                     array_push($main_answer_for_paint_canvas, $obj);
                                 }else{
@@ -317,6 +342,8 @@ class HomeController extends Controller
                                     }
                                 }
                             }
+
+
                         }
                     }
                 }

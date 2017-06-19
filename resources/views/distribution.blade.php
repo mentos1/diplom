@@ -189,8 +189,8 @@
                         }
                         if (data.answer_AvailablePerWeek == true && data.answer_created_at == true && data.weeked == true) {
                             console.log("Успех");
-                            //check_task = false;
-                            //document.forms['sendForm'].submit(); // дабавить Сабмит
+                            check_task = false;
+                            document.forms['sendForm'].submit(); // дабавить Сабмит
                         }
                     }
                 });

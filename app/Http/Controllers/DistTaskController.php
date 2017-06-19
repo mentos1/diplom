@@ -20,70 +20,6 @@ class DistTaskController extends Controller
 {
     public function index()
     {
-        /////////////////////////////////////////////////////////////
-        $Dis = DistTask::all();
-        $Distribution = Distribution::all();
-        $result_DistTask = array();
-        foreach($Dis as $d){
-            $dd = new class
-            {
-            };
-            $result_des = array();
-            $result_tech = array();
-            $dd->id = $d->id;
-            $dd->subject = $d->subject;
-            $dd->priority = $d->priority;
-            $dd->status = $d->status;
-            $dd->estimate = (int)$d->estimate;
-            foreach (Distribution::getDistTasksIdDescription($d->description) as $dist) {
-                array_push($result_des, $dist->description);
-            }
-            foreach (Distribution::getDistTasksIdTeches($d->technologies) as $dist) {
-                array_push($result_tech, $dist->tag);
-            }
-            $dd->description = $result_des;
-            $dd->technologies = $result_tech;
-            array_push($result_DistTask, $dd);
-        }
-
-
-        $no_repiat_dev = $result_DistTask;
-
-        $result_DistTask = array();
-        foreach($Dis as $d){
-            foreach ($Distribution as $item) {
-                if ($item->idTask == $d->id) {
-                    $dd = new class
-                    {
-                    };
-                    $result_des = array();
-                    $result_tech = array();
-                    $dd->id = $d->id;
-                    $dd->subject = $d->subject;
-                    $dd->priority = $d->priority;
-                    $dd->status = $d->status;
-                    $dd->estimate = (int)$d->estimate;
-                    foreach (Distribution::getDistTasksIdDescription($d->description) as $dist) {
-                        array_push($result_des, $dist->description);
-                    }
-                    foreach (Distribution::getDistTasksIdTeches($d->technologies) as $dist) {
-                        array_push($result_tech, $dist->tag);
-                    }
-                    $dd->description = $result_des;
-                    $dd->technologies = $result_tech;
-                    array_push($result_DistTask, $dd);
-                }
-            }
-        }
-        //dd($result_DistTask);
-
-        foreach ($no_repiat_dev as $elementKey => $element) {
-            foreach ($result_DistTask as $valueKey => $value) {
-                if($element->id == $value->id){
-                    unset($no_repiat_dev[$elementKey]);
-                }
-            }
-        }
 
         $status = StatusTask::all();
         $arr_status = [];
@@ -94,7 +30,7 @@ class DistTaskController extends Controller
         }
 
 
-        $date = [
+        $data = [
             'distTask' => DistTask::all(),
             'priority' => PriorityTask::all(),
             'status' => $arr_status,
@@ -102,7 +38,7 @@ class DistTaskController extends Controller
             'speciality' => Speciality::all(),
         ];
 
-        return view("dist_tasks",$date);
+        return view("dist_tasks",$data);
     }
 
     /**
@@ -123,9 +59,6 @@ class DistTaskController extends Controller
      */
     public function store(Request $request)
     {
-
-        //dd($request->all());
-
         $request->description;
 
         $msg = new  Description();

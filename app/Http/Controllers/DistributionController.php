@@ -57,8 +57,8 @@ class DistributionController extends Controller
             if($data_create_at->weekOfYear == $lastweek) {
                 $task = Distribution::getTaskById($d->idTask);
                 Distribution::updateDev($d->idProg,1);
-                $dev_AvailablePerWeek = Distribution::getAvailablePerWeek($d->idProg)[0]->AvailablePerWeek;
-                Distribution::setAvailablePerWeek($d->idProg,$task[0]->estimate + $dev_AvailablePerWeek );
+                $dev_AvailablePerWeek = Distribution::getAvailablePerWeek($d->idProg)[0]->AvailablePerWeek; // check here
+                Distribution::setAvailablePerWeek($d->idProg,$task[0]->estimate + $dev_AvailablePerWeek ); // why add
             }
         }
     }
@@ -146,10 +146,10 @@ class DistributionController extends Controller
 
                                 if($date_Create_T->timestamp < $date_now->timestamp && $date->timestamp > $date_now->timestamp) {
                                     $dd->DaysBeforeStart = $date_now->dayOfYear - $date->dayOfYear;
+                                    $dd->HoursBeforeStart = $date->hour;
                                     if($dd->DaysBeforeStart == 0){
                                         $dd->HoursBeforeStart = $date->hour - $date_now->hour;
                                     }
-                                    $dd->HoursBeforeStart = $date->hour;
 
                                 }
                             }
@@ -241,6 +241,7 @@ class DistributionController extends Controller
                         $answer_AvailablePerWeek = true;
                     } else {
                         $answer_AvailablePerWeek = false;
+                        break;
                     }
                 }
             }
@@ -257,6 +258,7 @@ class DistributionController extends Controller
                             $answer_created_at = true;
                         } else {
                             $answer_created_at = false;
+                            break;
                         }
                     }
                 }

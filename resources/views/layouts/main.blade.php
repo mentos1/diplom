@@ -63,8 +63,8 @@
             <li ><a href="http://localhost/diplom/public/">Home</a></li>
             <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Add or Drop<span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a href="developer">Developer</a></li>
-                    <li><a href="distTask">Task</a></li>
+                    <li><a href="//localhost/diplom/public/developer">Developer</a></li>
+                    <li><a href="//localhost/diplom/public/distTask">Task</a></li>
                 </ul>
             </li>
             <li><a href="//localhost/diplom/public/distribution">Distribution</a></li>
